@@ -63,7 +63,7 @@ popular_plane AS (
       AND flight_date >= DATE_TRUNC('month', CURRENT_DATE)
     GROUP BY aircraft_type
     ORDER BY COUNT(*) DESC
-    LIMIT 1
+    LIMIT 3
 ),
 longest_flight AS (
     SELECT 
@@ -73,6 +73,21 @@ longest_flight AS (
     FROM logbook_entries
     WHERE user_id = $1
       AND flight_date >= DATE_TRUNC('month', CURRENT_DATE)
+),
+average_flight_duration AS (
+    SELECT 
+        COALESCE(AVG(icus_day + icus_night + dual_day + dual_night + command_day + 
+            command_night + co_pilot_day + co_pilot_night + instrument_flight + instrument_sim), 0) 
+        AS average_flight_duration
+    FROM logbook_entries
+    WHERE user_id = $1
+),
+night_flight_hours AS (
+    SELECT 
+        COALESCE(SUM(icus_night + dual_night + command_night + co_pilot_night), 0) 
+        AS night_flight_hours
+    FROM logbook_entries
+    WHERE user_id = $1
 )
 SELECT 
     COALESCE(mh.hours_this_month, 0) AS hours_this_month,
@@ -80,7 +95,9 @@ SELECT
     COALESCE(lh.lifetime_hours, 0) AS lifetime_hours,
     COALESCE(pa.most_common_airport, 'N/A') AS popular_airport,
     COALESCE(pp.most_common_plane, 'N/A') AS popular_plane,
-    COALESCE(lf.longest_flight, 0) AS longest_flight
+    COALESCE(lf.longest_flight, 0) AS longest_flight,
+    COALESCE(afd.average_flight_duration, 0) AS average_flight_duration,
+    COALESCE(nfh.night_flight_hours, 0) AS night_flight_hours
 FROM 
     (SELECT 0 AS dummy) d
     LEFT JOIN monthly_hours mh ON true
@@ -88,7 +105,9 @@ FROM
     LEFT JOIN lifetime_hours lh ON true
     LEFT JOIN popular_airport pa ON true
     LEFT JOIN popular_plane pp ON true
-    LEFT JOIN longest_flight lf ON true;
+    LEFT JOIN longest_flight lf ON true
+    LEFT JOIN average_flight_duration afd ON true
+    LEFT JOIN night_flight_hours nfh ON true;
         `;
 
         const result = await pool.query(query, [userId]);
@@ -100,7 +119,9 @@ FROM
             lifetime_hours: 0,
             popular_airport: 'N/A',
             popular_plane: 'N/A',
-            longest_flight: 0
+            longest_flight: 0,
+            average_flight_duration: 0,
+            night_flight_hours: 0
         };
 
         res.render('pages/home', {
@@ -109,7 +130,9 @@ FROM
             lifetimeHours: stats.lifetime_hours,
             popularAirport: stats.popular_airport,
             popularPlane: stats.popular_plane,
-            longestFlight: stats.longest_flight
+            longestFlight: stats.longest_flight,
+            averageFlightDuration: stats.average_flight_duration,
+            nightFlightHours: stats.night_flight_hours
         });
 
     } catch (err) {
