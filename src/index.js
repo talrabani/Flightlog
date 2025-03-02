@@ -119,7 +119,7 @@ FROM
 });
 
 // Route that fetches the raw data from logbook_entries for user 1
-app.get('/statistics', async (req, res) => {
+app.get('/logbook', async (req, res) => {
     try {
         const userId = 1; // Replace with dynamic authentication later
 
@@ -129,7 +129,7 @@ app.get('/statistics', async (req, res) => {
 
         const result = await pool.query(query, [userId]);
 
-        res.render('pages/statistics', {
+        res.render('pages/logbook', {
             logbookEntries: result.rows
         });
 
