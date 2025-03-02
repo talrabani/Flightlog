@@ -162,5 +162,20 @@ app.get('/logbook', async (req, res) => {
     }
 });
 
+// Email export
+app.post("/export/email", (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required." });
+    }
+
+    // TODO: Implement email sending logic here (e.g., using Nodemailer)
+    console.log(`Sending logbook export to ${email}`);
+
+    res.json({ message: "Email sent successfully!" });
+});
+
+
 
 app.listen(3000, () => console.log('Server running on port 3000'));
