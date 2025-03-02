@@ -5,11 +5,44 @@
 <!-- Bootstrap JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<style>
+body {
+    background: url('https://www.aopa.org/-/media/Images/AOPA-Main/Training-and-Safety/ASI/Online-Courses/Runway-Safety/iStock_000032264068_Large.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure the navbar stays at the top */
+.navbar {
+    position: relative;
+    z-index: 10; /* Keeps it above the background */
+}
+
+/* Center the statistics container */
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh; /* Center the stats in the viewport */
+}
+
+/* Style the cards */
+.card {
+    background: rgba(255, 255, 255, 0.8); /* Light background for readability */
+    border-radius: 12px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%; /* Ensures all cards have the same height */
+}
+
+</style>
 </head>
 {{> nav }}
-<div class="container mt-5">
+
+<div class="container stats-container">
     <h2 class="text-center mb-4">Flight Log Statistics</h2>
-    <div class="row">
+    <div class="row g-4">  {{!-- "g-4" adds equal spacing --}}
         <div class="col-md-4">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
@@ -35,7 +68,8 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4">
+
+    <div class="row g-4 mt-2">
         <div class="col-md-4">
             <div class="card text-center shadow-sm">
                 <div class="card-body">

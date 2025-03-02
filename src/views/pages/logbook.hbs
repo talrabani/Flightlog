@@ -30,9 +30,35 @@
         <button class="btn btn-warning d-flex align-items-center">
             <i class="bi bi-pencil-square me-1"></i> Edit
         </button>
-        <button class="btn btn-primary d-flex align-items-center">
-            <i class="bi bi-download me-1"></i> Export
-        </button>
+    <!-- Export Button with Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-primary d-flex align-items-center dropdown-toggle" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download me-1"></i> Export
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                <li><button class="dropdown-item" id="exportExcel">
+                    <i class="bi bi-file-earmark-excel me-2 text-success"></i> Save as Excel Sheet
+                </button></li>
+                <li><button class="dropdown-item" id="exportPDF">
+                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Save as PDF
+                </button></li>
+                <!-- Cloud & Email Exports -->
+                <li><button class="dropdown-item" id="exportGoogleDrive">
+                    <i class="bi bi-google me-2 text-primary"></i> Save to Google Drive
+                </button></li>
+                <li><button class="dropdown-item" id="exportOneDrive">
+                    <i class="bi bi-cloud me-2 text-info"></i> Save to OneDrive
+                </button></li>
+                <li><button class="dropdown-item" id="exportDropbox">
+                    <i class="bi bi-box-arrow-up me-2 text-primary"></i> Save to Dropbox
+                </button></li>
+                <li><button class="dropdown-item" id="exportEmail">
+                    <i class="bi bi-envelope me-2 text-dark"></i> Email Export
+                </button></li>
+            </ul>
+        </div>
+
+
     </div>
     
     <!-- Table for displaying logbook entries -->
@@ -95,6 +121,10 @@
     });
 });
 
-        {{!-- Link to js for buttons edit and add --}}
+
+
+
+        {{!-- Link to js for buttons edit and add DOES NOT WORK SO FOR NOW THE CODE WILL BE BELOW --}}
     src="/js/logbook.js";
+
 </script>
