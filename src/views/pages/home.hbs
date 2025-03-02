@@ -1,0 +1,43 @@
+<h1>Pilot Logbook</h1>
+
+<!-- Form to add a new logbook entry -->
+<form action="/add" method="POST">
+  <input type="date" name="flight_date" required>
+  <input type="text" name="aircraft" placeholder="Aircraft" required>
+  <input type="text" name="departure" placeholder="Departure" required>
+  <input type="text" name="destination" placeholder="Destination" required>
+  <input type="number" name="hours_flown" placeholder="Hours Flown" step="0.1" min="0" required>
+  <textarea name="remarks" placeholder="Remarks (optional)"></textarea>
+  <button type="submit">Add Entry</button>
+</form>
+
+<!-- Table to display existing logbook entries -->
+{{#if entries}}
+  <h2>Your Logbook</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Aircraft</th>
+        <th>Departure</th>
+        <th>Destination</th>
+        <th>Hours</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each entries}}
+        <tr>
+          <td>{{this.flight_date}}</td>
+          <td>{{this.aircraft}}</td>
+          <td>{{this.departure}}</td>
+          <td>{{this.destination}}</td>
+          <td>{{this.hours_flown}}</td>
+          <td>{{this.remarks}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>No logbook entries yet. Add one above!</p>
+{{/if}}
