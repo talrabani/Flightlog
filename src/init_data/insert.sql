@@ -1,3 +1,30 @@
 ﻿INSERT INTO users (username, password) VALUES ('pilot1', 'hashedpassword');
-INSERT INTO logbook_entries (user_id, flight_date, aircraft, departure, destination, hours_flown, remarks)
-VALUES (1, '2025-03-03', 'Cessna 172', 'KJFK', 'KLAX', 5.5, 'Smooth flight');
+
+INSERT INTO logbook_entries (
+    user_id, flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew, 
+    route, details, engine_type, icus_day, icus_night, dual_day, dual_night, 
+    command_day, command_night, co_pilot_day, co_pilot_night, instrument_flight, instrument_sim
+) VALUES
+(1, '2021-03-03', 'PA28', 'VH-TAE', 'E.TSIATSIKAS', 'SELF', 'YMMB-YMMB', 'EOC', 'single', NULL, NULL, 0.9, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-03-07', 'PA28', 'VH-TAJ', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'S+L', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-03-14', 'PA28', 'VH-TXU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'C+D', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-03-16', 'PA28', 'VH-TAU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'MLT', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-03-28', 'PA28', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CDT', 'single', NULL, NULL, 0.9, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-03-30', 'PA28', 'VH-TAJ', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'STALLS', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-03', 'PA28', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'EFATO', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-06', 'PA28', 'VH-TAJ', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-08', 'PA28', 'VH-TAU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-13', 'PA28', 'VH-TXU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-15', 'PA28', 'VH-TAJ', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'FLAPLESS CCTS', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-04-24', 'PA28', 'VH-TAU', 'K.HUTCHINSON', NULL, 'YMMB-YMMB', 'FLAPLESS CCTS/GO AROUND', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-05-02', 'PA28', 'VH-TXU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'GLIDE CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-05-08', 'PA28', 'VH-TXU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-05-14', 'PA28', 'VH-TXU', 'C.PATTERSON', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-05-22', 'PA28', 'VH-TXU', 'K.HUTCHINSON', NULL, 'YMMB-YMMB', 'FIRST SOLO CCTS', 'single', NULL, NULL, NULL, NULL, 1.0, NULL, 0.5, NULL, NULL, NULL),
+(1, '2021-05-23', 'PA28', 'VH-TXU', 'E.LINCOLN-PRICE', 'SELF', 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-14', 'PA28', 'VH-TXU', 'K.HUTCHINSON', NULL, 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 0.7, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-14', 'PA28', 'VH-TXU', 'SELF', NULL, 'YMMB-YMMB', '2ND SOLO CCTS', 'single', NULL, NULL, NULL, NULL, 0.8, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-19', 'PA28', 'VH-TYD', 'SELF', NULL, 'YMMB-YMMB', 'DEP+APR', 'single', NULL, NULL, NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-20', 'PA28', 'VH-TXU', 'SELF', NULL, 'YMMB-YMMB', 'CCTS', 'single', NULL, NULL, 1.1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-20', 'PA28', 'VH-TXU', 'SELF', NULL, 'YMMB-YMMB', 'SLT', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, '2021-06-26', 'PA28', 'VH-TAJ', 'E.LINCOLN-PRICE', NULL, 'YMMB-YMMB', 'SIDE SLIP', 'single', NULL, NULL, 1.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
