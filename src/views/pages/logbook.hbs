@@ -13,6 +13,23 @@
     .flight-date {
         white-space: nowrap; /* Prevent line breaks */
     }
+
+        .selected-row {
+        background-color: #e0e0e0; /* Light gray highlight for selected rows */
+        transition: background-color 0.3s ease; /* Smooth transition for better UX */
+    }
+
+    .row-select {
+        cursor: pointer; /* Indicate clickable checkbox */
+    }
+
+    .sort-arrow {
+        color: #6c757d; /* Default gray color for arrows */
+    }
+
+    .sort-arrow.active {
+        color: #007BFF; /* Blue color for active (selected) arrow */
+    }
 </style>
 
 </head>
@@ -74,7 +91,13 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Flight Date</th>
+                        <th>
+                            Flight Date
+                            <span class="sort-arrows">
+                                <i class="bi bi-arrow-up ms-2 sort-arrow" data-sort="asc" style="cursor: pointer;"></i>
+                                <i class="bi bi-arrow-down ms-1 sort-arrow" data-sort="desc" style="cursor: pointer;"></i>
+                            </span>
+                        </th>
                         <th>Aircraft Type</th>
                         <th>Aircraft Reg</th>
                         <th>Pilot in Command</th>
@@ -143,6 +166,40 @@
         }2
     });
 });
+
+    // Sorting functionality for Flight Date
+        let sortDirection = null;
+        const sortArrows = document.querySelectorAll(".sort-arrow");
+        const tableBody = document.querySelector("#logbookTable tbody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        sortArrows.forEach(arrow => {
+            arrow.addEventListener("click", function () {
+                const direction = this.getAttribute("data-sort");
+                sortDirection = (sortDirection === direction) ? null : direction;
+
+                // Reset all arrow styles
+                sortArrows.forEach(a => a.classList.remove("active"));
+                if (sortDirection) {
+                    this.classList.add("active");
+                }
+
+                // Sort rows by flight date
+                rows.sort((a, b) => {
+                    const dateA = new Date(a.querySelector(".flight-date").getAttribute("data-date"));
+                    const dateB = new Date(b.querySelector(".flight-date").getAttribute("data-date"));
+                    if (sortDirection === "asc") {
+                        return dateA - dateB;
+                    } else if (sortDirection === "desc") {
+                        return dateB - dateA;
+                    }
+                    return 0; // No sort if null
+                });
+
+                // Reappend sorted rows
+                rows.forEach(row => tableBody.appendChild(row));
+            });
+        });
 
 
       // Edit button functionality
