@@ -20,7 +20,19 @@
       </div>
     {{/if}}
 
-    <form action="/addlog" method="POST" class="row g-3" novalidate>
+    <!-- Large rectangle box above form to Scan a photo, or drag and drop a file -->
+    <div class="card mb-5" style="border: 2px solid #007BFF; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <div class="card-body p-4">
+            <h5 class="card-title text-center">Scan a Photo</h5>
+            <p class="card-text text-center">Scan a photo of your logbook entry, or drag and drop a file here.</p>
+            <div class="d-flex justify-content-center">
+                <input type="file" class="form-control d-none" id="logbook_scan" name="logbook_scan" accept="image/*">
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('logbook_scan').click();">Select File</button>
+            </div>
+        </div>
+    </div>
+
+    <form action="/addlog" method="POST" class="row g-3" novalidate style="margin-top: 50px;">
         <!-- Flight Date -->
         <div class="col-md-6">
             <label for="flight_date" class="form-label">Flight Date</label>

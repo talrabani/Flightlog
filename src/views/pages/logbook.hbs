@@ -22,17 +22,17 @@
     <h2 class="text-center mb-4">My Logbook</h2>
 
     <div class="row flex-nowrap h-100">
-        <!-- Left Toolbar (narrow, ~15% width, flush left) -->
-        <div class="col-md-2 ps-5 d-flex flex-column h-100">
-            <div class="d-flex flex-column gap-2 mb-3 flex-grow-1">
-                <a href="/addlog" class="btn btn-success d-flex align-items-center justify-content-center">
+        <!-- Left Toolbar (narrow, ~15% width, flush left with light blue background) -->
+        <div class="col-md-2 ps-5 d-flex flex-column h-100" style="background-color: #ADD8E6; min-height: 100vh;">
+            <div class="d-flex flex-column gap-2 mb-3">
+                <a href="/addlog" class="btn btn-custom-add d-flex align-items-center justify-content-center w-100" style="background-color: #2E7D32; color: white; border: none; border-radius: 5px; position: relative; top: 20;">
                     <i class="bi bi-plus-lg me-1"></i> Add
                 </a>
-                <button class="btn btn-warning d-flex align-items-center justify-content-center">
+                <button class="btn btn-custom-edit d-flex align-items-center justify-content-center w-100" style="background-color: #F57F17; color: white; border: none; border-radius: 5px; position: relative; top: 20;">
                     <i class="bi bi-pencil-square me-1"></i> Edit
                 </button>
-                <div class="dropdown flex-grow-1">
-                    <button class="btn btn-primary d-flex align-items-center justify-content-center dropdown-toggle w-100" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropdown">
+                    <button class="btn btn-custom-export d-flex align-items-center justify-content-center dropdown-toggle w-100" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #1976D2; color: white; border: none; border-radius: 5px; position: relative; top: 20;">
                         <i class="bi bi-download me-1"></i> Export
                     </button>
                     <ul class="dropdown-menu w-100" aria-labelledby="exportDropdown">
@@ -58,13 +58,13 @@
                 </div>
             </div>
             <!-- Filter Section -->
-            <div class="d-flex flex-column gap-2 flex-grow-1">
-                <button class="btn btn-primary d-flex align-items-center justify-content-center">
+            <div class="d-flex flex-column gap-2 mt-3">
+                <button class="btn btn-custom-filter d-flex align-items-center justify-content-center w-100" style="background-color: #1976D2; color: white; border: none; border-radius: 5px;">
                     <i class="bi bi-funnel me-1"></i> Filter
                 </button>
-                <form class="d-flex flex-column gap-2 flex-grow-1">
+                <form class="d-flex flex-column gap-2">
                     <!-- Add filter properties here later -->
-                    <input type="text" class="form-control" placeholder="Filter properties TBD">
+                    <input type="text" class="form-control" placeholder="Filter properties TBD" style="border-radius: 5px;">
                 </form>
             </div>
         </div>
@@ -136,7 +136,7 @@
             } else {
                 td.textContent = "Invalid Date"; // Debugging
             }
-        }
+        }2
     });
 });
 
