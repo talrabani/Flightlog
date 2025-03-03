@@ -4,8 +4,8 @@
     password VARCHAR(255) NOT NULL
 );
 
--- Engine type can only be 'single' or 'multi'
-CREATE TYPE engine_category AS ENUM ('single', 'multi');
+-- Engine type can only be 'Single-Engine', 'Multi-Engine'
+CREATE TYPE engine_category AS ENUM ('Single-Engine', 'Multi-Engine');
 
 CREATE TABLE logbook_entries (
     id SERIAL PRIMARY KEY,

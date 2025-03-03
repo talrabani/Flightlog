@@ -1,0 +1,169 @@
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+{{!-- Nav bar --}}
+{{> nav}}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Add New Logbook Entry</h2>
+    {{#if errors}}
+      <div class="alert alert-danger">
+        <ul>
+          {{#each errors}}
+            <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/if}}
+
+    <form action="/addlog" method="POST" class="row g-3" novalidate>
+        <!-- Flight Date -->
+        <div class="col-md-6">
+            <label for="flight_date" class="form-label">Flight Date</label>
+            <input type="date" class="form-control" id="flight_date" name="flight_date" value="{{formData.flight_date}}" required>
+            <div class="invalid-feedback">Please select a valid flight date.</div>
+        </div>
+
+        <!-- Aircraft Type -->
+        <div class="col-md-6">
+            <label for="aircraft_type" class="form-label">Aircraft Type</label>
+            <input type="text" class="form-control" id="aircraft_type" name="aircraft_type" placeholder="e.g., Cessna 172" value="{{formData.aircraft_type}}" required maxlength="10">
+            <div class="invalid-feedback">Please enter a valid aircraft type (max 10 characters).</div>
+        </div>
+
+        <!-- Aircraft Registration -->
+        <div class="col-md-6">
+            <label for="aircraft_reg" class="form-label">Aircraft Registration</label>
+            <input type="text" class="form-control" id="aircraft_reg" name="aircraft_reg" placeholder="e.g., N12345" value="{{formData.aircraft_reg}}" required maxlength="10">
+            <div class="invalid-feedback">Please enter a valid registration (max 10 characters).</div>
+        </div>
+
+        <!-- Pilot in Command -->
+        <div class="col-md-6">
+            <label for="pilot_in_command" class="form-label">Pilot in Command</label>
+            <input type="text" class="form-control" id="pilot_in_command" name="pilot_in_command" placeholder="e.g., John Doe" value="{{formData.pilot_in_command}}" required maxlength="50">
+            <div class="invalid-feedback">Please enter a valid pilot name (max 50 characters).</div>
+        </div>
+
+        <!-- Other Crew -->
+        <div class="col-md-6">
+            <label for="other_crew" class="form-label">Other Crew</label>
+            <input type="text" class="form-control" id="other_crew" name="other_crew" placeholder="e.g., Jane Smith (optional)" value="{{formData.other_crew}}" maxlength="50">
+        </div>
+
+        <!-- Route -->
+        <div class="col-md-6">
+            <label for="route" class="form-label">Route</label>
+            <input type="text" class="form-control" id="route" name="route" placeholder="e.g., KJFK - KLAX" value="{{formData.route}}" required maxlength="100">
+            <div class="invalid-feedback">Please enter a valid route (max 100 characters).</div>
+        </div>
+
+        <!-- Details -->
+        <div class="col-12">
+            <label for="details" class="form-label">Details</label>
+            <textarea class="form-control" id="details" name="details" rows="3" placeholder="Additional notes (optional)">{{formData.details}}</textarea>
+        </div>
+
+        <!-- Engine Type -->
+        <div class="col-md-6">
+            <label for="engine_type" class="form-label">Engine Type</label>
+            <select class="form-select" id="engine_type" name="engine_type" required>
+                <option value="" {{!-- Only select if formData.engine_type is undefined or empty --}}
+                    {{#if (or (not formData.engine_type) (eq formData.engine_type ''))}}selected{{/if}}
+                >Select an engine type</option>
+                <option value="Single-Engine" {{eq formData.engine_type 'Single-Engine'}}>Single-Engine</option>
+                <option value="Multi-Engine" {{eq formData.engine_type 'Multi-Engine'}}>Multi-Engine</option>
+            </select>
+            <div class="invalid-feedback">Please select an engine type.</div>
+        </div>
+
+        <!-- ICUS Day/Night -->
+        <div class="col-md-3">
+            <label for="icus_day" class="form-label">ICUS Day (hrs)</label>
+            <input type="number" class="form-control" id="icus_day" name="icus_day" step="0.1" min="0" max="99.9" placeholder="e.g., 2.5" value="{{formData.icus_day}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="icus_night" class="form-label">ICUS Night (hrs)</label>
+            <input type="number" class="form-control" id="icus_night" name="icus_night" step="0.1" min="0" max="99.9" placeholder="e.g., 1.0" value="{{formData.icus_night}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+
+        <!-- Dual Day/Night -->
+        <div class="col-md-3">
+            <label for="dual_day" class="form-label">Dual Day (hrs)</label>
+            <input type="number" class="form-control" id="dual_day" name="dual_day" step="0.1" min="0" max="99.9" placeholder="e.g., 1.5" value="{{formData.dual_day}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="dual_night" class="form-label">Dual Night (hrs)</label>
+            <input type="number" class="form-control" id="dual_night" name="dual_night" step="0.1" min="0" max="99.9" placeholder="e.g., 0.5" value="{{formData.dual_night}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+
+        <!-- Command Day/Night -->
+        <div class="col-md-3">
+            <label for="command_day" class="form-label">Command Day (hrs)</label>
+            <input type="number" class="form-control" id="command_day" name="command_day" step="0.1" min="0" max="99.9" placeholder="e.g., 3.0" value="{{formData.command_day}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="command_night" class="form-label">Command Night (hrs)</label>
+            <input type="number" class="form-control" id="command_night" name="command_night" step="0.1" min="0" max="99.9" placeholder="e.g., 1.0" value="{{formData.command_night}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+
+        <!-- Co-Pilot Day/Night -->
+        <div class="col-md-3">
+            <label for="co_pilot_day" class="form-label">Co-Pilot Day (hrs)</label>
+            <input type="number" class="form-control" id="co_pilot_day" name="co_pilot_day" step="0.1" min="0" max="99.9" placeholder="e.g., 0.0" value="{{formData.co_pilot_day}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="co_pilot_night" class="form-label">Co-Pilot Night (hrs)</label>
+            <input type="number" class="form-control" id="co_pilot_night" name="co_pilot_night" step="0.1" min="0" max="99.9" placeholder="e.g., 0.0" value="{{formData.co_pilot_night}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+
+        <!-- Instrument Flight/Sim -->
+        <div class="col-md-3">
+            <label for="instrument_flight" class="form-label">Instrument Flight (hrs)</label>
+            <input type="number" class="form-control" id="instrument_flight" name="instrument_flight" step="0.1" min="0" max="99.9" placeholder="e.g., 0.5" value="{{formData.instrument_flight}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+        <div class="col-md-3">
+            <label for="instrument_sim" class="form-label">Instrument Sim (hrs)</label>
+            <input type="number" class="form-control" id="instrument_sim" name="instrument_sim" step="0.1" min="0" max="99.9" placeholder="e.g., 0.0" value="{{formData.instrument_sim}}">
+            <div class="invalid-feedback">Enter a value between 0 and 99.9.</div>
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+            <a href="/logbook" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-success">Save Entry</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Client-side validation for Bootstrap
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('row');
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>

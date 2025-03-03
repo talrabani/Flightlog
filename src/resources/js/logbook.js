@@ -1,5 +1,5 @@
 console.log(logbookEntries);
-
+// THIS DOCUMENT IS NOT WORKING AT THE MOMENT, THE SCRIPTS ARE AT THE BOTTOM OF LOGBOOK.HBS FOR NOW
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".flight-date").forEach(function (td) {

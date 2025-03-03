@@ -13,6 +13,17 @@ hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 app.use(express.static(path.join(__dirname, 'resources')));
 app.use(express.urlencoded({ extended: true }));
 
+// helper functions for handlebars
+hbs.registerHelper('eq', function (a, b) {
+    return a === b ? 'selected' : ''; // Return 'selected' if true, empty string if false
+  });
+hbs.registerHelper('not', function (value) {
+return !value;
+});
+hbs.registerHelper('or', function (a, b) {
+return a || b;
+});
+
 // Route that fetches statistics for user 1 and renders the home page
 app.get('/', async (req, res) => {
     try {
@@ -162,6 +173,123 @@ app.get('/logbook', async (req, res) => {
     }
 });
 
+// Route for addlog page
+app.get('/addlog', (req, res) => {
+    res.render('pages/addlog');
+});
+
+// Route for logbook page (statistics.hbs)
+app.get('/logbook', async (req, res) => {
+    try {
+      const userId = 1; // Replace with dynamic authentication later
+      const query = `
+        SELECT * FROM logbook_entries WHERE user_id = $1 ORDER BY flight_date DESC;
+      `;
+      const result = await pool.query(query, [userId]);
+      res.render('pages/statistics', { logbookEntries: result.rows });
+    } catch (err) {
+      console.error("Error fetching logbook entries:", err);
+      res.status(500).send("Server Error");
+    }
+  });
+  
+  // Route for addlog page
+  app.get('/addlog', (req, res) => {
+    res.render('pages/addlog');
+  });
+  
+  // Handle form submission with validation
+  app.post('/addlog', async (req, res) => {
+    const {
+      flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew, route, details, engine_type,
+      icus_day, icus_night, dual_day, dual_night, command_day, command_night, co_pilot_day, co_pilot_night,
+      instrument_flight, instrument_sim
+    } = req.body;
+  
+    // Validation function for hours (allow empty)
+    const parseHours = (value) => {
+      const num = value ? parseFloat(value) : 0;
+      return isNaN(num) || num < 0 || num > 99.9 ? 0 : num;
+    };
+  
+    // Parse numeric fields, defaulting to 0 if empty or invalid
+    const hours = {
+      icus_day: parseHours(icus_day),
+      icus_night: parseHours(icus_night),
+      dual_day: parseHours(dual_day),
+      dual_night: parseHours(dual_night),
+      command_day: parseHours(command_day),
+      command_night: parseHours(command_night),
+      co_pilot_day: parseHours(co_pilot_day),
+      co_pilot_night: parseHours(co_pilot_night),
+      instrument_flight: parseHours(instrument_flight),
+      instrument_sim: parseHours(instrument_sim)
+    };
+  
+    // Calculate total time
+    const totalTime = Object.values(hours).reduce((sum, val) => sum + val, 0);
+  
+    // Validation checks
+    const errors = [];
+    if (!flight_date || isNaN(new Date(flight_date))) errors.push("Invalid flight date.");
+    if (!aircraft_type || aircraft_type.length > 10) errors.push("Aircraft type is required and must be 10 characters or less.");
+    if (!aircraft_reg || aircraft_reg.length > 10) errors.push("Aircraft registration is required and must be 10 characters or less.");
+    if (!pilot_in_command || pilot_in_command.length > 50) errors.push("Pilot in command is required and must be 50 characters or less.");
+    if (other_crew && other_crew.length > 50) errors.push("Other crew must be 50 characters or less.");
+    if (!route || route.length > 100) errors.push("Route is required and must be 100 characters or less.");
+    if (!engine_type || !["Single-Engine", "Multi-Engine"].includes(engine_type)) errors.push("Invalid engine type.");
+    if (totalTime <= 0) errors.push("At least one time field must be greater than 0.");
+  
+    if (errors.length > 0) {
+      // Pass back the form data along with errors
+      return res.render('pages/addlog', {
+        errors,
+        formData: {
+          flight_date,
+          aircraft_type,
+          aircraft_reg,
+          pilot_in_command,
+          other_crew,
+          route,
+          details,
+          engine_type,
+          icus_day,
+          icus_night,
+          dual_day,
+          dual_night,
+          command_day,
+          command_night,
+          co_pilot_day,
+          co_pilot_night,
+          instrument_flight,
+          instrument_sim
+        }
+      });
+    }
+  
+    try {
+      await pool.query(
+        `INSERT INTO logbook_entries (
+          flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew, route, details, engine_type,
+          icus_day, icus_night, dual_day, dual_night, command_day, command_night, co_pilot_day, co_pilot_night,
+          instrument_flight, instrument_sim, user_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+        [
+          flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew || null, route, details || null, engine_type,
+          hours.icus_day, hours.icus_night, hours.dual_day, hours.dual_night,
+          hours.command_day, hours.command_night, hours.co_pilot_day, hours.co_pilot_night,
+          hours.instrument_flight, hours.instrument_sim, 1 // Hardcoded user_id=1 for now
+        ]
+      );
+      res.redirect('/logbook');
+    } catch (err) {
+      console.error("Error inserting logbook entry:", err);
+      res.render('pages/addlog', {
+        errors: ["Database error. Please try again."],
+        formData: req.body // Pass back form data on database error too
+      });
+    }
+  });
 // Email export
 app.post("/export/email", (req, res) => {
     const { email } = req.body;

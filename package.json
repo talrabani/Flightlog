@@ -2,7 +2,7 @@
   "name": "pilot-logbook",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon -L src/index.js --watch src"
   },
   "dependencies": {
     "express": "^4.18.2",

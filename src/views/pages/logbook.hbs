@@ -23,10 +23,18 @@
     <h2 class="text-center mb-4">My Logbook</h2>
 
     <!-- Buttons for logbook entries -->
-    <div class="d-flex justify-content-end gap-2 mb-3">
-        <button class="btn btn-success d-flex align-items-center">
-            <i class="bi bi-plus-lg me-1"></i> Add
+    <!-- Filter Section -->
+    <div class="mb-3 d-flex gap-2">
+        <input type="text" class="form-control" id="filterInput" placeholder="Filter by date, aircraft, or route">
+        <button class="btn btn-primary" id="filterButton">
+            <i class="bi bi-funnel me-1"></i> Filter
         </button>
+    </div>
+    <!-- Add & Edit Buttons -->
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a href="/addlog" class="btn btn-success d-flex align-items-center">
+            <i class="bi bi-plus-lg me-1"></i> Add
+        </a>
         <button class="btn btn-warning d-flex align-items-center">
             <i class="bi bi-pencil-square me-1"></i> Edit
         </button>
