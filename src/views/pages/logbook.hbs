@@ -18,118 +18,99 @@
 </head>
 
 {{> nav }}
-
-<div class="container mt-5">
+<div class="container-fluid mt-5 px-0">
     <h2 class="text-center mb-4">My Logbook</h2>
 
-    <!-- Buttons for logbook entries -->
-    <!-- Filter Section -->
-    <div class="mb-3 d-flex gap-2">
-        <input type="text" class="form-control" id="filterInput" placeholder="Filter by date, aircraft, or route">
-        <button class="btn btn-primary" id="filterButton">
-            <i class="bi bi-funnel me-1"></i> Filter
-        </button>
-    </div>
-    <!-- Add & Edit Buttons -->
-    <div class="d-flex justify-content-end gap-2 mb-3">
-        <a href="/addlog" class="btn btn-success d-flex align-items-center">
-            <i class="bi bi-plus-lg me-1"></i> Add
-        </a>
-        <button class="btn btn-warning d-flex align-items-center">
-            <i class="bi bi-pencil-square me-1"></i> Edit
-        </button>
-    <!-- Export Button with Dropdown -->
-        <div class="dropdown">
-            <button class="btn btn-primary d-flex align-items-center dropdown-toggle" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-download me-1"></i> Export
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                <li><button class="dropdown-item" id="exportExcel">
-                    <i class="bi bi-file-earmark-excel me-2 text-success"></i> Save as Excel Sheet
-                </button></li>
-                <li><button class="dropdown-item" id="exportPDF">
-                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Save as PDF
-                </button></li>
-                <!-- Cloud & Email Exports -->
-                <li><button class="dropdown-item" id="exportGoogleDrive">
-                    <i class="bi bi-google me-2 text-primary"></i> Save to Google Drive
-                </button></li>
-                <li><button class="dropdown-item" id="exportOneDrive">
-                    <i class="bi bi-cloud me-2 text-info"></i> Save to OneDrive
-                </button></li>
-                <li><button class="dropdown-item" id="exportDropbox">
-                    <i class="bi bi-box-arrow-up me-2 text-primary"></i> Save to Dropbox
-                </button></li>
-                <li><button class="dropdown-item" id="exportEmail">
-                    <i class="bi bi-envelope me-2 text-dark"></i> Email Export
-                </button></li>
-            </ul>
-        </div>
-
-
-    </div>
-    
-    <!-- Table for displaying logbook entries -->
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Flight Date</th>
-                <th>Aircraft Type</th>
-                <th>Aircraft Reg</th>
-                <th>Pilot in Command</th>
-                <th>Other Crew</th>
-                <th>Route</th>
-                <th>Details</th>
-                <th>Engine Type</th>
-                <th>ICUS (Day/Night)</th>
-                <th>Dual (Day/Night)</th>
-                <th>Command (Day/Night)</th>
-                <th>Co-Pilot (Day/Night)</th>
-                <th>Instrument (Flight/Sim)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each logbookEntries}}
-            <tr>
-                <td class="flight-date" data-date="{{this.flight_date}}"></td>
-                <td>{{this.aircraft_type}}</td>
-                <td>{{this.aircraft_reg}}</td>
-                <td>{{this.pilot_in_command}}</td>
-                <td>{{this.other_crew}}</td>
-                <td>{{this.route}}</td>
-                <td>{{this.details}}</td>
-                <td>{{this.engine_type}}</td>
-                <td>{{this.icus_day}} / {{this.icus_night}}</td>
-                <td>{{this.dual_day}} / {{this.dual_night}}</td>
-                <td>{{this.command_day}} / {{this.command_night}}</td>
-                <td>{{this.co_pilot_day}} / {{this.co_pilot_night}}</td>
-                <td>{{this.instrument_flight}} / {{this.instrument_sim}}</td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
-
-    <!-- Email Export Modal -->
-    <div class="modal fade" id="emailExportModal" tabindex="-1" aria-labelledby="emailExportModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="emailExportModalLabel">Export Logbook via Email</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label for="emailAddress" class="form-label">Enter recipient's email:</label>
-                    <input type="email" id="emailAddress" class="form-control" placeholder="example@email.com" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="sendEmail">Send</button>
+    <div class="row flex-nowrap h-100">
+        <!-- Left Toolbar (narrow, ~15% width, flush left) -->
+        <div class="col-md-2 ps-5 d-flex flex-column h-100">
+            <div class="d-flex flex-column gap-2 mb-3 flex-grow-1">
+                <a href="/addlog" class="btn btn-success d-flex align-items-center justify-content-center">
+                    <i class="bi bi-plus-lg me-1"></i> Add
+                </a>
+                <button class="btn btn-warning d-flex align-items-center justify-content-center">
+                    <i class="bi bi-pencil-square me-1"></i> Edit
+                </button>
+                <div class="dropdown flex-grow-1">
+                    <button class="btn btn-primary d-flex align-items-center justify-content-center dropdown-toggle w-100" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="exportDropdown">
+                        <li><button class="dropdown-item" id="exportExcel">
+                            <i class="bi bi-file-earmark-excel me-2 text-success"></i> Save as Excel Sheet
+                        </button></li>
+                        <li><button class="dropdown-item" id="exportPDF">
+                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Save as PDF
+                        </button></li>
+                        <li><button class="dropdown-item" id="exportGoogleDrive">
+                            <i class="bi bi-google me-2 text-primary"></i> Save to Google Drive
+                        </button></li>
+                        <li><button class="dropdown-item" id="exportOneDrive">
+                            <i class="bi bi-cloud me-2 text-info"></i> Save to OneDrive
+                        </button></li>
+                        <li><button class="dropdown-item" id="exportDropbox">
+                            <i class="bi bi-box-arrow-up me-2 text-primary"></i> Save to Dropbox
+                        </button></li>
+                        <li><button class="dropdown-item" id="exportEmail">
+                            <i class="bi bi-envelope me-2 text-dark"></i> Email Export
+                        </button></li>
+                    </ul>
                 </div>
             </div>
+            <!-- Filter Section -->
+            <div class="d-flex flex-column gap-2 flex-grow-1">
+                <button class="btn btn-primary d-flex align-items-center justify-content-center">
+                    <i class="bi bi-funnel me-1"></i> Filter
+                </button>
+                <form class="d-flex flex-column gap-2 flex-grow-1">
+                    <!-- Add filter properties here later -->
+                    <input type="text" class="form-control" placeholder="Filter properties TBD">
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Table (wider, ~85% width) -->
+        <div class="col-md-10 pe-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Flight Date</th>
+                        <th>Aircraft Type</th>
+                        <th>Aircraft Reg</th>
+                        <th>Pilot in Command</th>
+                        <th>Other Crew</th>
+                        <th>Route</th>
+                        <th>Details</th>
+                        <th>Engine Type</th>
+                        <th>ICUS (Day/Night)</th>
+                        <th>Dual (Day/Night)</th>
+                        <th>Command (Day/Night)</th>
+                        <th>Co-Pilot (Day/Night)</th>
+                        <th>Instrument (Flight/Sim)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each logbookEntries}}
+                    <tr>
+                        <td class="flight-date" data-date="{{this.flight_date}}"></td>
+                        <td>{{this.aircraft_type}}</td>
+                        <td>{{this.aircraft_reg}}</td>
+                        <td>{{this.pilot_in_command}}</td>
+                        <td>{{this.other_crew}}</td>
+                        <td>{{this.route}}</td>
+                        <td>{{this.details}}</td>
+                        <td>{{this.engine_type}}</td>
+                        <td>{{this.icus_day}} / {{this.icus_night}}</td>
+                        <td>{{this.dual_day}} / {{this.dual_night}}</td>
+                        <td>{{this.command_day}} / {{this.command_night}}</td>
+                        <td>{{this.co_pilot_day}} / {{this.co_pilot_night}}</td>
+                        <td>{{this.instrument_flight}} / {{this.instrument_sim}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
-
-
 </div>
 <script>
 
