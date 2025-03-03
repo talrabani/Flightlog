@@ -87,11 +87,12 @@
                         <th>Command (Day/Night)</th>
                         <th>Co-Pilot (Day/Night)</th>
                         <th>Instrument (Flight/Sim)</th>
+                        <th></th> <!-- Column for checkboxes -->
                     </tr>
                 </thead>
                 <tbody>
                     {{#each logbookEntries}}
-                    <tr>
+                    <tr data-id="{{this.id}}">
                         <td class="flight-date" data-date="{{this.flight_date}}"></td>
                         <td>{{this.aircraft_type}}</td>
                         <td>{{this.aircraft_reg}}</td>
@@ -105,6 +106,9 @@
                         <td>{{this.command_day}} / {{this.command_night}}</td>
                         <td>{{this.co_pilot_day}} / {{this.co_pilot_night}}</td>
                         <td>{{this.instrument_flight}} / {{this.instrument_sim}}</td>
+                        <td> <!-- Column for checkboxes -->
+                            <input type="checkbox" class="row-select" data-id="{{this.id}}" style="transform: scale(1.5); margin-right: 5px;">
+                        </td>
                     </tr>
                     {{/each}}
                 </tbody>
@@ -139,6 +143,48 @@
         }2
     });
 });
+
+
+      // Edit button functionality
+        let editActive = false;
+        const editButton = document.querySelector(".btn-custom-edit");
+        const checkboxes = document.querySelectorAll(".row-select");
+
+        editButton.addEventListener("click", function () {
+            editActive = !editActive; // Toggle edit mode
+            if (editActive) {
+                // Show checkboxes
+                checkboxes.forEach(checkbox => {
+                    checkbox.style.display = "block";
+                });
+                editButton.style.backgroundColor = "#F57F17"; // Keep original color or adjust for active state
+                alert("Edit mode activated. Click checkboxes to select rows for editing.");
+            } else {
+                // Hide checkboxes and deselect all
+                checkboxes.forEach(checkbox => {
+                    checkbox.style.display = "none";
+                    checkbox.checked = false;
+                });
+                // Clear any row highlights
+                document.querySelectorAll("tr").forEach(row => {
+                    row.classList.remove("selected-row");
+                });
+                alert("Edit mode deactivated.");
+            }
+        });
+
+        // Handle row selection with checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.style.display = "none"; // Initially hide checkboxes
+            checkbox.addEventListener("change", function () {
+                const row = this.closest("tr");
+                if (this.checked) {
+                    row.classList.add("selected-row");
+                } else {
+                    row.classList.remove("selected-row");
+                }
+            });
+        });
 
     document.addEventListener("DOMContentLoaded", function () {
     // Show modal when "Email Export" is clicked
