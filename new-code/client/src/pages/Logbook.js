@@ -30,6 +30,10 @@ function Logbook() {
     fetchEntries();
   }, []);
 
+  const calculateTotal = (values) => {
+    return values.reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
@@ -52,18 +56,24 @@ function Logbook() {
             </TableHead>
             <TableBody>
               {entries.map((entry) => {
-                const totalDay = (entry.icus_day || 0) + 
-                               (entry.dual_day || 0) + 
-                               (entry.command_day || 0) + 
-                               (entry.co_pilot_day || 0);
+                const totalDay = calculateTotal([
+                  entry.icus_day,
+                  entry.dual_day,
+                  entry.command_day,
+                  entry.co_pilot_day
+                ]);
                 
-                const totalNight = (entry.icus_night || 0) + 
-                                 (entry.dual_night || 0) + 
-                                 (entry.command_night || 0) + 
-                                 (entry.co_pilot_night || 0);
+                const totalNight = calculateTotal([
+                  entry.icus_night,
+                  entry.dual_night,
+                  entry.command_night,
+                  entry.co_pilot_night
+                ]);
                 
-                const totalInstrument = (entry.instrument_flight || 0) + 
-                                      (entry.instrument_sim || 0);
+                const totalInstrument = calculateTotal([
+                  entry.instrument_flight,
+                  entry.instrument_sim
+                ]);
 
                 const totalTime = totalDay + totalNight + totalInstrument;
 
