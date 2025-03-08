@@ -15,7 +15,6 @@ function App() {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/logbook">Logbook</Link></li>
-            <li><Link to="/addlog">Add Entry</Link></li>
           </ul>
         </nav>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Container,
@@ -10,11 +11,14 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Box
+  Box,
+  Button
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import config from '../config';
 
 function Logbook() {
+  const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
@@ -37,9 +41,19 @@ function Logbook() {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Flight Logbook
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4" gutterBottom>
+            Flight Logbook
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/addlog')}
+          >
+            Add Entry
+          </Button>
+        </Box>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="flight logbook">
             <TableHead>
