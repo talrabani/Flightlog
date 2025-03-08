@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: pilot
+      POSTGRES_PASSWORD: securepassword123
+      POSTGRES_DB: pilot_logbook
+    ports:
+      - '5432:5432'
+    volumes:
+      - pilot-logbook:/var/lib/postgresql/data
+      - ./server/db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://pilot:securepassword123@db:5432/pilot_logbook
+      PORT: 3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      - db
+    networks:
+      - app-network
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+      - WATCHPACK_POLLING=true
+      - WDS_SOCKET_PORT=0
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - '3000:3000'
+    depends_on:
+      - server
+    networks:
+      - app-network
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+volumes:
+  pilot-logbook:
+
+networks:
+  app-network:
+    driver: bridge 
