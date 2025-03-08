@@ -4,6 +4,16 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL
 );
 
+
+
+CREATE TABLE aircraft_types (
+    id SERIAL PRIMARY KEY,
+    designator VARCHAR(10) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    manufacturer VARCHAR(100) NOT NULL,
+    wtc VARCHAR(3) NOT NULL
+); -- wtc can be mixed such as L/M
+
 -- Engine type can only be 'Single-Engine', 'Multi-Engine'
 CREATE TYPE engine_category AS ENUM ('Single-Engine', 'Multi-Engine');
 
@@ -11,7 +21,7 @@ CREATE TABLE logbook_entries (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     flight_date DATE NOT NULL,
-    aircraft_type VARCHAR(10) NOT NULL,
+    aircraft_type INT NOT NULL REFERENCES aircraft_types(id),
     aircraft_reg VARCHAR(10) NOT NULL,
     pilot_in_command VARCHAR(50) NOT NULL,
     other_crew VARCHAR(50),

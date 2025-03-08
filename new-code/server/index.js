@@ -216,5 +216,48 @@ app.post('/api/logbook', async (req, res) => {
   }
 });
 
+// Search aircraft types
+app.get('/api/aircraft-types/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+    // Split the search query into words
+    const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+    
+    // Create the WHERE clause conditions
+    const conditions = searchTerms.map((_, index) => `
+      (
+        LOWER(designator) LIKE LOWER($${index + 1}) OR
+        LOWER(manufacturer) LIKE LOWER($${index + 1}) OR
+        LOWER(model) LIKE LOWER($${index + 1}) OR
+        LOWER(designator || ' ' || manufacturer || ' ' || model) LIKE LOWER($${index + 1})
+      )
+    `).join(' AND ');
+
+    const searchQuery = `
+      SELECT designator, model, manufacturer, wtc,
+             designator || ' - ' || manufacturer || ' ' || model AS search_text
+      FROM aircraft_types
+      WHERE ${conditions}
+      ORDER BY 
+        CASE 
+          WHEN LOWER(designator) = LOWER($1) THEN 1
+          WHEN LOWER(designator) LIKE LOWER($1 || '%') THEN 2
+          ELSE 3
+        END,
+        designator
+      LIMIT 10;
+    `;
+
+    // Create parameters array with wildcards
+    const params = searchTerms.map(term => `%${term}%`);
+    
+    const result = await pool.query(searchQuery, params);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error searching aircraft types:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

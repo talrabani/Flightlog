@@ -10,13 +10,16 @@ import {
   Typography,
   Box,
   MenuItem,
-  Alert
+  Alert,
+  Autocomplete
 } from '@mui/material';
 import config from '../config';
 
 function AddLog() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [aircraftOptions, setAircraftOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     flight_date: '',
     aircraft_type: '',
@@ -37,6 +40,20 @@ function AddLog() {
     instrument_flight: '0',
     instrument_sim: '0'
   });
+
+  const searchAircraft = async (searchText) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${config.apiUrl}/api/aircraft-types/search`, {
+        params: { query: searchText }
+      });
+      setAircraftOptions(response.data);
+    } catch (error) {
+      console.error('Error searching aircraft:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -124,13 +141,45 @@ function AddLog() {
                 </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  name="aircraft_type"
-                  label="Aircraft Type"
-                  value={formData.aircraft_type}
-                  onChange={handleChange}
-                  fullWidth
-                  required
+                <Autocomplete
+                  options={aircraftOptions}
+                  getOptionLabel={(option) => 
+                    typeof option === 'string' 
+                      ? option 
+                      : `${option.designator} - ${option.manufacturer} ${option.model}`
+                  }
+                  filterOptions={(options, state) => options}
+                  onInputChange={(event, newInputValue) => {
+                    if (newInputValue && newInputValue.length >= 2) {
+                      searchAircraft(newInputValue);
+                    }
+                  }}
+                  onChange={(event, newValue) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      aircraft_type: newValue ? newValue.designator : ''
+                    }));
+                  }}
+                  loading={loading}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      <div>
+                        <strong>{option.designator}</strong> - {option.manufacturer} {option.model}
+                        <span style={{ marginLeft: '8px', color: '#666' }}>
+                          (WTC: {option.wtc})
+                        </span>
+                      </div>
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Aircraft Type"
+                      required
+                      fullWidth
+                      helperText="Search by designator (e.g., P28A), manufacturer, or model (e.g., Warrior)"
+                    />
+                  )}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
