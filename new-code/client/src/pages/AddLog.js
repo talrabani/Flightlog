@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -12,14 +12,17 @@ import {
   MenuItem,
   Alert,
   Autocomplete,
-  capitalize
+  IconButton,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import config from '../config';
 
 function AddLog() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [aircraftOptions, setAircraftOptions] = useState([]);
+  const [airportOptions, setAirportOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     flight_date: '',
@@ -27,7 +30,10 @@ function AddLog() {
     aircraft_reg: '',
     pilot_in_command: '',
     other_crew: '',
-    route: '',
+    route_data: [
+      { type: 'departure', icao: '' },
+      { type: 'arrival', icao: '' }
+    ],
     details: '',
     engine_type: 'Single-Engine',
     icus_day: '0',
@@ -56,11 +62,50 @@ function AddLog() {
     }
   };
 
+  const searchAirports = async (searchText) => {
+    try {
+      const response = await axios.get(`${config.apiUrl}/api/airports/search`, {
+        params: { query: searchText }
+      });
+      setAirportOptions(response.data);
+    } catch (error) {
+      console.error('Error searching airports:', error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleRouteChange = (index, value) => {
+    const newRouteData = [...formData.route_data];
+    newRouteData[index].icao = value ? value.icao : '';
+    setFormData(prev => ({
+      ...prev,
+      route_data: newRouteData
+    }));
+  };
+
+  const addRouteStop = () => {
+    setFormData(prev => ({
+      ...prev,
+      route_data: [
+        ...prev.route_data.slice(0, -1),
+        { type: 'stop', icao: '' },
+        prev.route_data[prev.route_data.length - 1]
+      ]
+    }));
+  };
+
+  const removeRouteStop = (index) => {
+    if (index === 0 || index === formData.route_data.length - 1) return; // Only protect departure and arrival
+    setFormData(prev => ({
+      ...prev,
+      route_data: prev.route_data.filter((_, i) => i !== index)
     }));
   };
 
@@ -92,18 +137,6 @@ function AddLog() {
     }
   };
 
-  const TimeField = ({ name, label }) => (
-    <TextField
-      name={name}
-      label={label}
-      type="number"
-      value={formData[name]}
-      onChange={handleChange}
-      inputProps={{ step: "0.1", min: "0", max: "24" }}
-      fullWidth
-      margin="normal"
-    />
-  );
 
   return (
     <Container maxWidth={false} sx={{ width: '95%' }}>
@@ -209,16 +242,65 @@ function AddLog() {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <TextField
-                      name="route"
-                      label="Route"
-                      value={formData.route}
-                      onChange={handleChange}
-                      multiline
-                      rows={4}
-                      fullWidth
-                      required
-                    />
+                    <Box sx={{ 
+                      border: 1, 
+                      borderColor: 'divider', 
+                      borderRadius: 1,
+                      p: 2
+                    }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Routes
+                      </Typography>
+                      
+                      {formData.route_data.map((stop, index) => (
+                        <Box key={index} sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                          <Autocomplete
+                            options={airportOptions}
+                            getOptionLabel={(option) => 
+                              option.icao ? `${option.airport_name} (${option.icao})` : ''
+                            }
+                            value={airportOptions.find(opt => opt.icao === stop.icao) || null}
+                            onChange={(_, newValue) => handleRouteChange(index, newValue)}
+                            onInputChange={(_, newInputValue) => {
+                              if (newInputValue.length >= 2) {
+                                searchAirports(newInputValue);
+                              }
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label={
+                                  index === 0 ? "Departure Airport" :
+                                  index === formData.route_data.length - 1 ? "Arrival Airport" :
+                                  `Stop ${index}`
+                                }
+                                required
+                                fullWidth
+                              />
+                            )}
+                            sx={{ flex: 1 }}
+                          />
+                          {index !== 0 && index !== formData.route_data.length - 1 && (
+                            <IconButton 
+                              onClick={() => removeRouteStop(index)}
+                              sx={{ ml: 1 }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )}
+                        </Box>
+                      ))}
+                      
+                      <Button
+                        startIcon={<AddIcon />}
+                        onClick={addRouteStop}
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mt: 1 }}
+                      >
+                        Add Stop
+                      </Button>
+                    </Box>
                   </Grid>
                 </Grid>
               </Grid>

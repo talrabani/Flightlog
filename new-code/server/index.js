@@ -402,5 +402,38 @@ app.get('/api/dashboard/:userId', async (req, res) => {
   }
 });
 
+// Search airports
+app.get('/api/airports/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+    const searchQuery = `
+      SELECT 
+        id, icao, iata, airport_name, country_code, 
+        region_name, latitude, longitude
+      FROM airports
+      WHERE 
+        LOWER(icao) LIKE LOWER($1) OR
+        LOWER(iata) LIKE LOWER($1) OR
+        LOWER(airport_name) LIKE LOWER($1)
+      ORDER BY 
+        CASE 
+          WHEN LOWER(icao) = LOWER($2) THEN 1
+          WHEN LOWER(icao) LIKE LOWER($2 || '%') THEN 2
+          WHEN LOWER(iata) = LOWER($2) THEN 3
+          WHEN LOWER(iata) LIKE LOWER($2 || '%') THEN 4
+          ELSE 5
+        END,
+        airport_name
+      LIMIT 10;
+    `;
+
+    const result = await pool.query(searchQuery, [`%${query}%`, query]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error searching airports:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
