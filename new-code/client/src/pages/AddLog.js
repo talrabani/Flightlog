@@ -11,7 +11,8 @@ import {
   Box,
   MenuItem,
   Alert,
-  Autocomplete
+  Autocomplete,
+  capitalize
 } from '@mui/material';
 import config from '../config';
 
@@ -143,11 +144,8 @@ function AddLog() {
               <Grid item xs={12} sm={6}>
                 <Autocomplete
                   options={aircraftOptions}
-                  getOptionLabel={(option) => 
-                    typeof option === 'string' 
-                      ? option 
-                      : `${option.designator} - ${option.manufacturer} ${option.model}`
-                  }
+                  getOptionLabel={(option) => `${option.model}, ${option.manufacturer.toUpperCase()} - ${option.designator}`}
+                  
                   filterOptions={(options, state) => options}
                   onInputChange={(event, newInputValue) => {
                     if (newInputValue && newInputValue.length >= 2) {
@@ -164,7 +162,7 @@ function AddLog() {
                   renderOption={(props, option) => (
                     <li {...props}>
                       <div>
-                        <strong>{option.designator}</strong> - {option.manufacturer} {option.model}
+                        <strong>{option.model}</strong>, {option.manufacturer.toUpperCase()} - {option.designator}
                         <span style={{ marginLeft: '8px', color: '#666' }}>
                           (WTC: {option.wtc})
                         </span>

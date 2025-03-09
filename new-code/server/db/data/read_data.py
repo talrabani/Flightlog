@@ -1,5 +1,5 @@
 # Read aircraft types from ICAO DOC8643 PDF
-# Link: https://cfapps.icao.int/doc8643/
+# Link: https://cfapps.icao.int/doc8643/ Last updated: 23 March 2016
 import pdfplumber
 import pandas as pd
 import re
@@ -21,58 +21,6 @@ def ensure_utf8(text: str) -> str:
         # Encode and decode to clean up any problematic characters
         return text.encode('utf-8', errors='ignore').decode('utf-8')
     return str(text)
-
-def parse_aircraft_line(line: str) -> Dict:
-    """Parse a single line of aircraft data using regex."""
-    # Format: MODEL, MANUFACTURER DESIGNATOR WTC
-    # Example: "269B, SCHWEIZER H269 L"
-    # Example with spaces: "A-24 Viking, AEROPRAKT AP24 L"
-    
-    try:
-        # Split the line into segments by whitespace
-        segments = line.strip().split()
-        
-        # Last element should be the WTC
-        wtc = segments[-1]
-        if wtc not in ['H', 'M', 'J', 'L']:
-            print(f"Invalid WTC in line: {line}")
-            return None
-            
-        # Second last element should be the designator (2-4 alphanumeric chars)
-        designator = segments[-2]
-        if not re.match(r'^[A-Z0-9]{2,4}$', designator):
-            print(f"Invalid designator in line: {line}")
-            return None
-            
-        # Find the comma that separates model from manufacturer
-        comma_index = line.find(',')
-        if comma_index == -1:
-            print(f"No comma found in line: {line}")
-            return None
-            
-        # Split into model and the rest
-        model = line[:comma_index].strip()
-        rest = line[comma_index + 1:].strip()
-        
-        # Remove the designator and WTC from the end to get manufacturer
-        manufacturer = rest[:-(len(designator) + len(wtc) + 2)].strip()
-        
-        # Validate all parts exist
-        if not all([model, manufacturer, designator, wtc]):
-            print(f"Missing required fields in line: {line}")
-            return None
-            
-        return {
-            'model': model,
-            'manufacturer': manufacturer,
-            'designator': designator,
-            'wtc': wtc
-        }
-        
-    except Exception as e:
-        print(f"Error parsing line: {line}")
-        print(f"Error: {str(e)}")
-        return None
 
 
 def split_columns(text: str) -> List[str]:
@@ -147,18 +95,21 @@ def extract_aircraft_from_pdf(pdf_path: str) -> List[Dict]:
                         comma_index1 = next((i for i, s in enumerate(aircraft1_segments) if ',' in s), None)
                         # Aircraft 1 model is the elements before and including the comma
                         aircraft1_model = ' '.join(aircraft1_segments[:comma_index1 + 1])
+                        # Remove trailing comma
+                        aircraft1_model = aircraft1_model.rstrip(',')
                         # Aircraft 1 manufacturer is the elements after the comma
                         aircraft1_manufacturer = ' '.join(aircraft1_segments[comma_index1 + 1:])
 
                         comma_index2 = next((i for i, s in enumerate(aircraft2_segments) if ',' in s), None)
                         aircraft2_model = ' '.join(aircraft2_segments[:comma_index2 + 1])
+                        aircraft2_model = aircraft2_model.rstrip(',')
                         aircraft2_manufacturer = ' '.join(aircraft2_segments[comma_index2 + 1:])
 
                         # Append entries to aircraft_data
                         aircraft_data.append({
                             'model': aircraft1_model,
                             'manufacturer': aircraft1_manufacturer,
-                            'designator': aircraft2_designator,
+                            'designator': aircraft1_designator,
                             'wtc': aircraft1_wtc
                         })
 

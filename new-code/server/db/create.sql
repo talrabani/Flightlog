@@ -8,7 +8,7 @@ CREATE TABLE users (
 
 CREATE TABLE aircraft_types (
     id SERIAL PRIMARY KEY,
-    designator VARCHAR(10) NOT NULL,
+    designator VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
     manufacturer VARCHAR(100) NOT NULL,
     wtc VARCHAR(3) NOT NULL

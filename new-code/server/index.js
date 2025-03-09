@@ -64,19 +64,22 @@ app.get('/api/statistics/:userId', async (req, res) => {
         WHERE flight_year = DATE_PART('year', CURRENT_DATE)
       ),
       popular_airport AS (
-        SELECT COALESCE(route, 'N/A') AS most_common_airport
+        SELECT COALESCE(route, '') AS most_common_airport
         FROM logbook_entries
         WHERE user_id = $1
+          AND route IS NOT NULL
         GROUP BY route
         ORDER BY COUNT(*) DESC
         LIMIT 1
       ),
       popular_plane AS (
-        SELECT COALESCE(aircraft_type, 'N/A') AS most_common_plane
-        FROM logbook_entries
-        WHERE user_id = $1
-          AND flight_date >= DATE_TRUNC('month', CURRENT_DATE)
-        GROUP BY aircraft_type
+        SELECT COALESCE(at.designator || ' - ' || at.manufacturer || ' ' || at.model, '') AS most_common_plane
+        FROM logbook_entries le
+        LEFT JOIN aircraft_types at ON le.aircraft_type = at.id
+        WHERE le.user_id = $1
+          AND le.flight_date >= DATE_TRUNC('month', CURRENT_DATE)
+          AND le.aircraft_type IS NOT NULL
+        GROUP BY at.designator, at.manufacturer, at.model
         ORDER BY COUNT(*) DESC
         LIMIT 3
       ),
@@ -108,8 +111,8 @@ app.get('/api/statistics/:userId', async (req, res) => {
         COALESCE(mh.hours_this_month, 0) AS hours_this_month,
         COALESCE(yh.hours_this_year, 0) AS hours_this_year,
         COALESCE(lh.lifetime_hours, 0) AS lifetime_hours,
-        COALESCE(pa.most_common_airport, 'N/A') AS popular_airport,
-        COALESCE(pp.most_common_plane, 'N/A') AS popular_plane,
+        COALESCE(pa.most_common_airport, '') AS popular_airport,
+        COALESCE(pp.most_common_plane, '') AS popular_plane,
         COALESCE(lf.longest_flight, 0) AS longest_flight,
         COALESCE(afd.average_flight_duration, 0) AS average_flight_duration,
         COALESCE(nfh.night_flight_hours, 0) AS night_flight_hours
@@ -234,17 +237,50 @@ app.get('/api/aircraft-types/search', async (req, res) => {
     `).join(' AND ');
 
     const searchQuery = `
-      SELECT designator, model, manufacturer, wtc,
-             designator || ' - ' || manufacturer || ' ' || model AS search_text
-      FROM aircraft_types
-      WHERE ${conditions}
+      WITH search_results AS (
+        SELECT 
+          id, 
+          designator, 
+          model, 
+          manufacturer, 
+          wtc,
+          CASE
+            -- Exact matches in model get highest priority
+            WHEN ${searchTerms.map((_, i) => `LOWER(model) ~ ('\\m' || LOWER($${i + 1}) || '\\M')`).join(' AND ')} THEN 1
+            -- Partial word matches in model get second priority
+            WHEN ${searchTerms.map((_, i) => `LOWER(model) LIKE LOWER($${i + 1})`).join(' AND ')} THEN 2
+            -- Exact matches in designator get third priority
+            WHEN LOWER(designator) = LOWER($1) THEN 3
+            -- Partial matches in designator get fourth priority
+            WHEN LOWER(designator) LIKE LOWER($1 || '%') THEN 4
+            -- Matches in manufacturer get fifth priority
+            WHEN ${searchTerms.map((_, i) => `LOWER(manufacturer) LIKE LOWER($${i + 1})`).join(' AND ')} THEN 5
+            -- Any other matches get lowest priority
+            ELSE 6
+          END as match_priority,
+          -- Calculate how many search terms match
+          ${searchTerms.map((_, i) => `
+            CASE WHEN LOWER(model) LIKE LOWER($${i + 1}) THEN 2
+                 WHEN LOWER(designator) LIKE LOWER($${i + 1}) THEN 2
+                 WHEN LOWER(manufacturer) LIKE LOWER($${i + 1}) THEN 1
+                 ELSE 0
+            END
+          `).join(' + ')} as match_score
+        FROM aircraft_types
+        WHERE ${conditions}
+      )
+      SELECT 
+        id, 
+        designator, 
+        model, 
+        manufacturer, 
+        wtc
+      FROM search_results
       ORDER BY 
-        CASE 
-          WHEN LOWER(designator) = LOWER($1) THEN 1
-          WHEN LOWER(designator) LIKE LOWER($1 || '%') THEN 2
-          ELSE 3
-        END,
-        designator
+        match_priority ASC,
+        match_score DESC,
+        LENGTH(model) ASC,
+        model ASC
       LIMIT 10;
     `;
 
@@ -255,6 +291,113 @@ app.get('/api/aircraft-types/search', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error searching aircraft types:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+}); 
+
+// Get dashboard stats
+app.get('/api/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const query = `
+      WITH total_hours AS (
+        SELECT 
+          COALESCE(SUM(icus_day + icus_night + dual_day + dual_night + command_day + 
+            command_night + co_pilot_day + co_pilot_night + instrument_flight + instrument_sim), 0) 
+          AS summed_hours,
+          DATE_PART('year', flight_date) AS flight_year,
+          DATE_PART('month', flight_date) AS flight_month
+        FROM logbook_entries
+        WHERE user_id = $1
+        GROUP BY flight_year, flight_month
+      ),
+      lifetime_hours AS (
+        SELECT COALESCE(SUM(icus_day + icus_night + dual_day + dual_night + command_day + 
+          command_night + co_pilot_day + co_pilot_night + instrument_flight + instrument_sim), 0) 
+        AS lifetime_hours
+        FROM logbook_entries
+        WHERE user_id = $1
+      ),
+      monthly_hours AS (
+        SELECT COALESCE(SUM(summed_hours), 0) AS hours_this_month 
+        FROM total_hours
+        WHERE flight_year = DATE_PART('year', CURRENT_DATE)
+          AND flight_month = DATE_PART('month', CURRENT_DATE)
+      ),
+      yearly_hours AS (
+        SELECT COALESCE(SUM(summed_hours), 0) AS hours_this_year 
+        FROM total_hours
+        WHERE flight_year = DATE_PART('year', CURRENT_DATE)
+      ),
+      popular_airport AS (
+        SELECT COALESCE(route, '') AS most_common_airport
+        FROM logbook_entries
+        WHERE user_id = $1
+          AND route IS NOT NULL
+        GROUP BY route
+        ORDER BY COUNT(*) DESC
+        LIMIT 1
+      ),
+      popular_plane AS (
+        SELECT COALESCE(at.designator || ' - ' || at.manufacturer || ' ' || at.model, '') AS most_common_plane
+        FROM logbook_entries le
+        LEFT JOIN aircraft_types at ON le.aircraft_type = at.id
+        WHERE le.user_id = $1
+          AND le.flight_date >= DATE_TRUNC('month', CURRENT_DATE)
+          AND le.aircraft_type IS NOT NULL
+        GROUP BY at.designator, at.manufacturer, at.model
+        ORDER BY COUNT(*) DESC
+        LIMIT 3
+      ),
+      longest_flight AS (
+        SELECT 
+          COALESCE(MAX(icus_day + icus_night + dual_day + dual_night + command_day + 
+            command_night + co_pilot_day + co_pilot_night + instrument_flight + instrument_sim), 0) 
+          AS longest_flight
+        FROM logbook_entries
+        WHERE user_id = $1
+          AND flight_date >= DATE_TRUNC('month', CURRENT_DATE)
+      ),
+      average_flight_duration AS (
+        SELECT 
+          COALESCE(AVG(icus_day + icus_night + dual_day + dual_night + command_day + 
+            command_night + co_pilot_day + co_pilot_night + instrument_flight + instrument_sim), 0) 
+          AS average_flight_duration
+        FROM logbook_entries
+        WHERE user_id = $1
+      ),
+      night_flight_hours AS (
+        SELECT 
+          COALESCE(SUM(icus_night + dual_night + command_night + co_pilot_night), 0) 
+          AS night_flight_hours
+        FROM logbook_entries
+        WHERE user_id = $1
+      )
+      SELECT 
+        COALESCE(mh.hours_this_month, 0) AS hours_this_month,
+        COALESCE(yh.hours_this_year, 0) AS hours_this_year,
+        COALESCE(lh.lifetime_hours, 0) AS lifetime_hours,
+        COALESCE(pa.most_common_airport, '') AS popular_airport,
+        COALESCE(pp.most_common_plane, '') AS popular_plane,
+        COALESCE(lf.longest_flight, 0) AS longest_flight,
+        COALESCE(afd.average_flight_duration, 0) AS average_flight_duration,
+        COALESCE(nfh.night_flight_hours, 0) AS night_flight_hours
+      FROM 
+        (SELECT 0 AS dummy) d
+        LEFT JOIN monthly_hours mh ON true
+        LEFT JOIN yearly_hours yh ON true
+        LEFT JOIN lifetime_hours lh ON true
+        LEFT JOIN popular_airport pa ON true
+        LEFT JOIN popular_plane pp ON true
+        LEFT JOIN longest_flight lf ON true
+        LEFT JOIN average_flight_duration afd ON true
+        LEFT JOIN night_flight_hours nfh ON true;
+    `;
+
+    const result = await pool.query(query, [userId]);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error getting dashboard stats:", err);
     res.status(500).json({ error: "Server Error" });
   }
 });
