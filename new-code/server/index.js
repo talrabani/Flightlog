@@ -406,6 +406,8 @@ app.get('/api/dashboard/:userId', async (req, res) => {
 app.get('/api/airports/search', async (req, res) => {
   try {
     const { query } = req.query;
+    console.log('Received airport search request:', { query });
+    
     const searchQuery = `
       SELECT 
         id, icao, iata, airport_name, country_code, 
@@ -421,17 +423,34 @@ app.get('/api/airports/search', async (req, res) => {
           WHEN LOWER(icao) LIKE LOWER($2 || '%') THEN 2
           WHEN LOWER(iata) = LOWER($2) THEN 3
           WHEN LOWER(iata) LIKE LOWER($2 || '%') THEN 4
-          ELSE 5
+          WHEN LOWER(airport_name) LIKE LOWER('%' || $2 || '%') THEN 5
+          ELSE 6
         END,
+        LENGTH(airport_name),
         airport_name
       LIMIT 10;
     `;
 
+    console.log('Executing query with params:', [`%${query}%`, query]);
     const result = await pool.query(searchQuery, [`%${query}%`, query]);
-    res.json(result.rows);
+    console.log('Query results:', result.rows);
+    
+    // Transform the results to match the expected format
+    const transformedResults = result.rows.map(airport => ({
+      id: airport.id,
+      icao: airport.icao,
+      iata: airport.iata,
+      airport_name: airport.airport_name,
+      country_code: airport.country_code,
+      region_name: airport.region_name,
+      latitude: airport.latitude,
+      longitude: airport.longitude
+    }));
+
+    res.json(transformedResults);
   } catch (err) {
     console.error("Error searching airports:", err);
-    res.status(500).json({ error: "Server Error" });
+    res.status(500).json({ error: "Server Error", details: err.message });
   }
 });
 

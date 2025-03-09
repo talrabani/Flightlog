@@ -31,8 +31,8 @@ function AddLog() {
     pilot_in_command: '',
     other_crew: '',
     route_data: [
-      { type: 'departure', icao: '' },
-      { type: 'arrival', icao: '' }
+      { type: 'departure', airport_id: null, is_custom: false, custom_name: null },
+      { type: 'arrival', airport_id: null, is_custom: false, custom_name: null }
     ],
     details: '',
     engine_type: 'Single-Engine',
@@ -64,12 +64,19 @@ function AddLog() {
 
   const searchAirports = async (searchText) => {
     try {
+      console.log('Searching airports with URL:', `${config.apiUrl}/api/airports/search?query=${searchText}`);
       const response = await axios.get(`${config.apiUrl}/api/airports/search`, {
         params: { query: searchText }
       });
+      console.log('Airport search response:', response.data);
       setAirportOptions(response.data);
     } catch (error) {
       console.error('Error searching airports:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
     }
   };
 
@@ -83,7 +90,12 @@ function AddLog() {
 
   const handleRouteChange = (index, value) => {
     const newRouteData = [...formData.route_data];
-    newRouteData[index].icao = value ? value.icao : '';
+    newRouteData[index] = {
+      type: index === 0 ? 'departure' : index === formData.route_data.length - 1 ? 'arrival' : 'stop',
+      airport_id: value ? value.id : null,
+      is_custom: false,
+      custom_name: null
+    };
     setFormData(prev => ({
       ...prev,
       route_data: newRouteData
@@ -95,7 +107,7 @@ function AddLog() {
       ...prev,
       route_data: [
         ...prev.route_data.slice(0, -1),
-        { type: 'stop', icao: '' },
+        { type: 'stop', airport_id: null, is_custom: false, custom_name: null },
         prev.route_data[prev.route_data.length - 1]
       ]
     }));
@@ -259,7 +271,7 @@ function AddLog() {
                             getOptionLabel={(option) => 
                               option.icao ? `${option.airport_name} (${option.icao})` : ''
                             }
-                            value={airportOptions.find(opt => opt.icao === stop.icao) || null}
+                            value={airportOptions.find(opt => opt.id === stop.airport_id) || null}
                             onChange={(_, newValue) => handleRouteChange(index, newValue)}
                             onInputChange={(_, newInputValue) => {
                               if (newInputValue.length >= 2) {
