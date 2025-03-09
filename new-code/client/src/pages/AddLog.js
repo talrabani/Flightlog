@@ -89,8 +89,10 @@ function AddLog() {
   };
 
   const handleRouteChange = (index, value) => {
+    console.log('Selected airport:', value);
     const newRouteData = [...formData.route_data];
     newRouteData[index] = {
+      ...newRouteData[index],
       type: index === 0 ? 'departure' : index === formData.route_data.length - 1 ? 'arrival' : 'stop',
       airport_id: value ? value.id : null,
       is_custom: false,
@@ -269,7 +271,7 @@ function AddLog() {
                           <Autocomplete
                             options={airportOptions}
                             getOptionLabel={(option) => 
-                              option.icao ? `${option.airport_name} (${option.icao})` : ''
+                              option ? `${option.icao} - ${option.airport_name}` : ''
                             }
                             value={airportOptions.find(opt => opt.id === stop.airport_id) || null}
                             onChange={(_, newValue) => handleRouteChange(index, newValue)}
@@ -278,6 +280,13 @@ function AddLog() {
                                 searchAirports(newInputValue);
                               }
                             }}
+                            renderOption={(props, option) => (
+                              <li {...props}>
+                                <Typography component="span">
+                                  <strong>{option.icao}</strong> - {option.airport_name}
+                                </Typography>
+                              </li>
+                            )}
                             renderInput={(params) => (
                               <TextField
                                 {...params}
@@ -291,6 +300,11 @@ function AddLog() {
                               />
                             )}
                             sx={{ flex: 1 }}
+                            isOptionEqualToValue={(option, value) => {
+                              if (!option || !value) return false;
+                              return option.id === value.id;
+                            }}
+                            filterOptions={(x) => x}
                           />
                           {index !== 0 && index !== formData.route_data.length - 1 && (
                             <IconButton 

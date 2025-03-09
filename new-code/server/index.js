@@ -416,7 +416,7 @@ app.get('/api/airports/search', async (req, res) => {
       WHERE 
         LOWER(icao) LIKE LOWER($1) OR
         LOWER(iata) LIKE LOWER($1) OR
-        LOWER(airport_name) LIKE LOWER($1)
+        LOWER(airport_name) LIKE LOWER('%' || $2 || '%')
       ORDER BY 
         CASE 
           WHEN LOWER(icao) = LOWER($2) THEN 1
