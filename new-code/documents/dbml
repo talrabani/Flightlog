@@ -12,6 +12,24 @@ Table users {
   status varchar [default: 'active']
 }
 
+Table airports {
+  id integer [primary key]
+  iata varchar(3)
+  icao varchar(4) [unique]
+  airport_name varchar [not null]
+  country_code varchar(2)
+  region_name varchar
+  latitude decimal(10,7)
+  longitude decimal(10,7)
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    icao [name: 'idx_airports_icao']
+    iata [name: 'idx_airports_iata']
+  }
+}
+
 Table logbook_entries {
   id integer [primary key]
   user_id integer [ref: > users.id]
@@ -20,7 +38,7 @@ Table logbook_entries {
   aircraft_reg varchar [not null]
   pilot_in_command varchar [not null]
   other_crew varchar
-  route_data jsonb [note: 'Array of airports with format: [{""icao": "EGLL", "type": "departure"}, {"icao": "EHAM", "type": "destination"}]']"
+  route_data jsonb [note: 'Array of waypoints with format: {"type": "departure|stop|arrival", "airport_id": null, "is_custom": boolean, "custom_name": "string"}']
   details text
   engine_type varchar [not null]
   icus_day decimal [default: 0]

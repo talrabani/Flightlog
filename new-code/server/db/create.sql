@@ -25,17 +25,25 @@ CREATE TABLE logbook_entries (
     aircraft_reg VARCHAR(10) NOT NULL,
     pilot_in_command VARCHAR(50) NOT NULL,
     other_crew VARCHAR(50),
-    route VARCHAR(100),
+    route_data JSONB NOT NULL DEFAULT '[]',
     details TEXT,
     engine_type engine_category NOT NULL,
-    icus_day NUMERIC(3,1) NOT NULL,
-    icus_night NUMERIC(3,1) NOT NULL,
-    dual_day NUMERIC(3,1) NOT NULL,
-    dual_night NUMERIC(3,1) NOT NULL,
-    command_day NUMERIC(3,1) NOT NULL,
-    command_night NUMERIC(3,1) NOT NULL,
-    co_pilot_day NUMERIC(3,1) NOT NULL,
-    co_pilot_night NUMERIC(3,1) NOT NULL,
-    instrument_flight NUMERIC(3,1) NOT NULL,
-    instrument_sim NUMERIC(3,1) NOT NULL
-); 
+    icus_day NUMERIC(3,1) NOT NULL DEFAULT 0,
+    icus_night NUMERIC(3,1) NOT NULL DEFAULT 0,
+    dual_day NUMERIC(3,1) NOT NULL DEFAULT 0,
+    dual_night NUMERIC(3,1) NOT NULL DEFAULT 0,
+    command_day NUMERIC(3,1) NOT NULL DEFAULT 0,
+    command_night NUMERIC(3,1) NOT NULL DEFAULT 0,
+    co_pilot_day NUMERIC(3,1) NOT NULL DEFAULT 0,
+    co_pilot_night NUMERIC(3,1) NOT NULL DEFAULT 0,
+    instrument_flight NUMERIC(3,1) NOT NULL DEFAULT 0,
+    instrument_sim NUMERIC(3,1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Add indexes
+CREATE INDEX idx_logbook_user_date ON logbook_entries(user_id, flight_date);
+CREATE INDEX idx_logbook_aircraft ON logbook_entries(aircraft_type);
+CREATE INDEX idx_route_data ON logbook_entries USING GIN (route_data); 
