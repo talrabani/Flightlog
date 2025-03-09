@@ -1,0 +1,58 @@
+// Database Schema https://dbdiagram.io/d
+Table users {
+  id integer [primary key]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  first_name varchar
+  last_name varchar
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  last_login timestamp
+  role varchar [default: 'user']
+  status varchar [default: 'active']
+}
+
+Table logbook_entries {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  flight_date date [not null]
+  aircraft_type integer [ref: > aircraft_types.id]
+  aircraft_reg varchar [not null]
+  pilot_in_command varchar [not null]
+  other_crew varchar
+  route_data jsonb [note: 'Array of airports with format: [{"icao": "EGLL", "type": "departure"}, {"icao": "EHAM", "type": "destination"}]']
+  details text
+  engine_type varchar [not null]
+  icus_day decimal [default: 0]
+  icus_night decimal [default: 0]
+  dual_day decimal [default: 0]
+  dual_night decimal [default: 0]
+  command_day decimal [default: 0]
+  command_night decimal [default: 0]
+  co_pilot_day decimal [default: 0]
+  co_pilot_night decimal [default: 0]
+  instrument_flight decimal [default: 0]
+  instrument_sim decimal [default: 0]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+
+  indexes {
+    (user_id, flight_date) [name: 'idx_logbook_user_date']
+    aircraft_type [name: 'idx_logbook_aircraft']
+    route_data [type: gin, name: 'idx_route_data'] // GIN index for JSONB querying
+  }
+}
+
+Table aircraft_types {
+  id integer [primary key]
+  designator varchar [unique, not null]
+  manufacturer varchar [not null]
+  model varchar [not null]
+  wtc char [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+
+  indexes {
+    designator [unique]
+  }
+}

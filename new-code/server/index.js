@@ -281,7 +281,7 @@ app.get('/api/aircraft-types/search', async (req, res) => {
         match_score DESC,
         LENGTH(model) ASC,
         model ASC
-      LIMIT 10;
+      LIMIT 20;
     `;
 
     // Create parameters array with wildcards

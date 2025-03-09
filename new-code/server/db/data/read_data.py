@@ -75,10 +75,8 @@ def extract_aircraft_from_pdf(pdf_path: str) -> List[Dict]:
                         # Handle multiple entries eg. "610 Evolution, BRUMBY BR61 L 728JET, FAIRCHILD DORNIER J728 M"
                         # split by ' '
                         segments = line.split(' ')
-                        print(f"Segments: {segments}")
                         # Find index of first WTC, 'L', 'M', 'J', 'H', 'L/M', 'L/J', 'L/H', 'M/J', 'M/H', 'J/H', 'L/M/J', 'L/M/H', 'L/J/H', 'M/J/H', 'L/M/J/H'
                         wtc_index = segments.index(next(filter(lambda x: x in ['L', 'M', 'J', 'H', 'L/M', 'L/J', 'L/H', 'M/J', 'M/H', 'J/H', 'L/M/J', 'L/M/H', 'L/J/H', 'M/J/H', 'L/M/J/H'], segments)))
-                        print(f"WTC index: {wtc_index}")
 
                         aircraft1_segments = segments[:wtc_index + 1]
                         aircraft2_segments = segments[wtc_index + 1:]
