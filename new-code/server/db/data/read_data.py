@@ -74,25 +74,6 @@ def parse_aircraft_line(line: str) -> Dict:
         print(f"Error: {str(e)}")
         return None
 
-def split_joint_rows(line: str) -> List[Dict]:
-    """Split and parse a line that contains multiple aircraft entries."""
-    results = []
-    # Split on commas and reconstruct entries
-    parts = line.split(',')
-    
-    current_entry = []
-    for part in parts:
-        current_entry.append(part.strip())
-        # If this part ends with a WTC category, it's the end of an entry
-        if re.search(r'[HMJL]$', part.strip()):
-            # Join the parts with commas and parse
-            entry = ', '.join(current_entry)
-            aircraft = parse_aircraft_line(entry)
-            if aircraft:
-                results.append(aircraft)
-            current_entry = []
-    
-    return results
 
 def split_columns(text: str) -> List[str]:
     """Split the text into left and right columns."""
@@ -136,23 +117,61 @@ def extract_aircraft_from_pdf(pdf_path: str) -> List[Dict]:
             
             # Process each line
             for line in lines:
+                
                 try:
                     # Clean and encode the line
                     line = ensure_utf8(line.strip())
-                    
+
                     # Check if line contains multiple entries
                     if line.count(',') > 1:
-                        # Handle multiple entries
-                        entries = split_joint_rows(line)
-                        aircraft_data.extend(entries)
-                    else:
-                        # Handle single entry
-                        aircraft = parse_aircraft_line(line)
-                        if aircraft and aircraft['wtc'] in ['H', 'M', 'L', 'J']:
-                            aircraft_data.append(aircraft)
-                        else:
-                            print(f"Skipping invalid line: {line}")
-                        
+                        # Handle multiple entries eg. "610 Evolution, BRUMBY BR61 L 728JET, FAIRCHILD DORNIER J728 M"
+                        # split by ' '
+                        segments = line.split(' ')
+                        print(f"Segments: {segments}")
+                        # Find index of first WTC, 'L', 'M', 'J', 'H', 'L/M', 'L/J', 'L/H', 'M/J', 'M/H', 'J/H', 'L/M/J', 'L/M/H', 'L/J/H', 'M/J/H', 'L/M/J/H'
+                        wtc_index = segments.index(next(filter(lambda x: x in ['L', 'M', 'J', 'H', 'L/M', 'L/J', 'L/H', 'M/J', 'M/H', 'J/H', 'L/M/J', 'L/M/H', 'L/J/H', 'M/J/H', 'L/M/J/H'], segments)))
+                        print(f"WTC index: {wtc_index}")
+
+                        aircraft1_segments = segments[:wtc_index + 1]
+                        aircraft2_segments = segments[wtc_index + 1:]
+
+                        # Pop off WTC from end of segments
+                        aircraft1_wtc = aircraft1_segments.pop()
+                        aircraft2_wtc = aircraft2_segments.pop()
+
+                        # Pop off designator from end of segments
+                        aircraft1_designator = aircraft1_segments.pop()
+                        aircraft2_designator = aircraft2_segments.pop()
+
+                        # Find element in aircraft1_segments that contains a comma
+                        comma_index1 = next((i for i, s in enumerate(aircraft1_segments) if ',' in s), None)
+                        # Aircraft 1 model is the elements before and including the comma
+                        aircraft1_model = ' '.join(aircraft1_segments[:comma_index1 + 1])
+                        # Aircraft 1 manufacturer is the elements after the comma
+                        aircraft1_manufacturer = ' '.join(aircraft1_segments[comma_index1 + 1:])
+
+                        comma_index2 = next((i for i, s in enumerate(aircraft2_segments) if ',' in s), None)
+                        aircraft2_model = ' '.join(aircraft2_segments[:comma_index2 + 1])
+                        aircraft2_manufacturer = ' '.join(aircraft2_segments[comma_index2 + 1:])
+
+                        # Append entries to aircraft_data
+                        aircraft_data.append({
+                            'model': aircraft1_model,
+                            'manufacturer': aircraft1_manufacturer,
+                            'designator': aircraft2_designator,
+                            'wtc': aircraft1_wtc
+                        })
+
+                        aircraft_data.append({
+                            'model': aircraft2_model,
+                            'manufacturer': aircraft2_manufacturer,
+                            'designator': aircraft2_designator,
+                            'wtc': aircraft2_wtc
+                        })
+
+                    else: # Single line entry
+                        raise Exception(f"Single line entry: {line}")
+
                 except Exception as e:
                     print(f"Error processing line: {ensure_utf8(line)}")
                     print(f"Error: {str(e)}")
