@@ -64,11 +64,20 @@ app.get('/api/statistics/:userId', async (req, res) => {
         WHERE flight_year = DATE_PART('year', CURRENT_DATE)
       ),
       popular_airport AS (
-        SELECT COALESCE(route, '') AS most_common_airport
-        FROM logbook_entries
-        WHERE user_id = $1
-          AND route IS NOT NULL
-        GROUP BY route
+        SELECT 
+            COALESCE(
+                jsonb_build_object(
+                    'icao', airports.icao,
+                    'name', airports.airport_name
+                )::text,
+                ''
+            ) AS most_common_airport
+        FROM logbook_entries,
+             jsonb_array_elements(route_data) AS route_stops
+             JOIN airports ON (route_stops->>'airport_id')::integer = airports.id
+        WHERE logbook_entries.user_id = $1
+          AND route_data IS NOT NULL
+        GROUP BY airports.icao, airports.airport_name
         ORDER BY COUNT(*) DESC
         LIMIT 1
       ),
@@ -330,11 +339,20 @@ app.get('/api/dashboard/:userId', async (req, res) => {
         WHERE flight_year = DATE_PART('year', CURRENT_DATE)
       ),
       popular_airport AS (
-        SELECT COALESCE(route, '') AS most_common_airport
-        FROM logbook_entries
-        WHERE user_id = $1
-          AND route IS NOT NULL
-        GROUP BY route
+        SELECT 
+            COALESCE(
+                jsonb_build_object(
+                    'icao', airports.icao,
+                    'name', airports.airport_name
+                )::text,
+                ''
+            ) AS most_common_airport
+        FROM logbook_entries,
+             jsonb_array_elements(route_data) AS route_stops
+             JOIN airports ON (route_stops->>'airport_id')::integer = airports.id
+        WHERE logbook_entries.user_id = $1
+          AND route_data IS NOT NULL
+        GROUP BY airports.icao, airports.airport_name
         ORDER BY COUNT(*) DESC
         LIMIT 1
       ),

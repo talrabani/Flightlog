@@ -68,7 +68,19 @@ function Home() {
           <StatCard title="Hours This Month" value={stats.hours_this_month} unit="hrs" />
           <StatCard title="Hours This Year" value={stats.hours_this_year} unit="hrs" />
           <StatCard title="Lifetime Hours" value={stats.lifetime_hours} unit="hrs" />
-          <StatCard title="Most Common Airport" value={stats.popular_airport} />
+          <StatCard 
+            title="Most Common Airport" 
+            value={
+              stats.popular_airport && stats.popular_airport !== 'N/A' ? 
+                (() => {
+                    const airport = JSON.parse(stats.popular_airport);
+                    return airport.icao ? 
+                        `${airport.icao} - ${airport.name}` :
+                        airport.name;
+                })() :
+                'N/A'
+            } 
+          />
           <StatCard title="Most Common Aircraft" value={stats.popular_plane} />
           <StatCard title="Longest Flight" value={stats.longest_flight} unit="hrs" />
           <StatCard title="Average Flight Duration" value={stats.average_flight_duration} unit="hrs" />
