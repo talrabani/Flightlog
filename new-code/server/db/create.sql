@@ -5,14 +5,36 @@ CREATE TABLE users (
 );
 
 
+CREATE TABLE IF NOT EXISTS aircraft_types (
+                id SERIAL PRIMARY KEY,
+                designator VARCHAR(4),
+                model VARCHAR(255),
+                manufacturer VARCHAR(255) NOT NULL,
+                wtc VARCHAR(3),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            
+CREATE INDEX IF NOT EXISTS idx_aircraft_types_designator ON aircraft_types(designator);
 
-CREATE TABLE aircraft_types (
-    id SERIAL PRIMARY KEY,
-    designator VARCHAR(100) NOT NULL,
-    model VARCHAR(100) NOT NULL,
-    manufacturer VARCHAR(100) NOT NULL,
-    wtc VARCHAR(3) NOT NULL
-); -- wtc can be mixed such as L/M
+
+CREATE TABLE IF NOT EXISTS airports (
+                id SERIAL PRIMARY KEY,
+                iata VARCHAR(3),
+                icao VARCHAR(4) UNIQUE,
+                airport_name VARCHAR(255) NOT NULL,
+                country_code VARCHAR(2),
+                region_name VARCHAR(255),
+                latitude DECIMAL(10, 7),
+                longitude DECIMAL(10, 7),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            
+CREATE INDEX IF NOT EXISTS idx_airports_icao ON airports(icao);
+CREATE INDEX IF NOT EXISTS idx_airports_iata ON airports(iata);
+
+
 
 -- Engine type can only be 'Single-Engine', 'Multi-Engine'
 CREATE TYPE engine_category AS ENUM ('Single-Engine', 'Multi-Engine');
