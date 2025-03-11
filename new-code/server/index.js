@@ -173,7 +173,7 @@ app.post('/api/logbook', async (req, res) => {
       aircraft_reg,
       pilot_in_command,
       other_crew,
-      route,
+      route_data,
       details,
       engine_type,
       icus_day,
@@ -191,7 +191,7 @@ app.post('/api/logbook', async (req, res) => {
     const query = `
       INSERT INTO logbook_entries (
         flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew, 
-        route, details, engine_type, icus_day, icus_night, dual_day, dual_night,
+        route_data, details, engine_type, icus_day, icus_night, dual_day, dual_night,
         command_day, command_night, co_pilot_day, co_pilot_night,
         instrument_flight, instrument_sim, user_id
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
@@ -204,7 +204,7 @@ app.post('/api/logbook', async (req, res) => {
       aircraft_reg,
       pilot_in_command,
       other_crew || null,
-      route,
+      JSON.stringify(route_data),
       details || null,
       engine_type,
       icus_day || 0,
@@ -238,7 +238,7 @@ app.get('/api/aircraft-types/search', async (req, res) => {
     // Create the WHERE clause conditions
     const conditions = searchTerms.map((_, index) => `
       (
-        LOWER(designator) LIKE LOWER($${index + 1}) OR
+        LOWER(REPLACE(REPLACE(designator, '-', ''),'.', '' )) LIKE LOWER($${index + 1}) OR
         LOWER(manufacturer) LIKE LOWER($${index + 1}) OR
         LOWER(model) LIKE LOWER($${index + 1}) OR
         LOWER(designator || ' ' || manufacturer || ' ' || model) LIKE LOWER($${index + 1})

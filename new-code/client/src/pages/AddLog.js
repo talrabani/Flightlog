@@ -31,8 +31,8 @@ function AddLog() {
     pilot_in_command: '',
     other_crew: '',
     route_data: [
-      { type: 'departure', airport_id: null, is_custom: false, custom_name: null },
-      { type: 'arrival', airport_id: null, is_custom: false, custom_name: null }
+      { type: 'departure', airport_id: null, airport_data: null, is_custom: false, custom_name: null },
+      { type: 'arrival', airport_id: null, airport_data: null, is_custom: false, custom_name: null }
     ],
     details: '',
     engine_type: 'Single-Engine',
@@ -54,6 +54,7 @@ function AddLog() {
       const response = await axios.get(`${config.apiUrl}/api/aircraft-types/search`, {
         params: { query: searchText }
       });
+      console.log('Aircraft search response:', response.data);
       setAircraftOptions(response.data);
     } catch (error) {
       console.error('Error searching aircraft:', error);
@@ -82,6 +83,7 @@ function AddLog() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log('Handling change for:', name, value);
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -95,6 +97,7 @@ function AddLog() {
       ...newRouteData[index],
       type: index === 0 ? 'departure' : index === formData.route_data.length - 1 ? 'arrival' : 'stop',
       airport_id: value ? value.id : null,
+      airport_data: value,
       is_custom: false,
       custom_name: null
     };
@@ -109,7 +112,7 @@ function AddLog() {
       ...prev,
       route_data: [
         ...prev.route_data.slice(0, -1),
-        { type: 'stop', airport_id: null, is_custom: false, custom_name: null },
+        { type: 'stop', airport_id: null, airport_data: null, is_custom: false, custom_name: null },
         prev.route_data[prev.route_data.length - 1]
       ]
     }));
@@ -120,6 +123,15 @@ function AddLog() {
     setFormData(prev => ({
       ...prev,
       route_data: prev.route_data.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAircraftSelect = (selectedAircraft) => {
+    console.log('Selected aircraft:', selectedAircraft);
+    setFormData(prevData => ({
+      ...prevData,
+      aircraft_type: selectedAircraft,
+      aircraft_reg: selectedAircraft.registration
     }));
   };
 
@@ -137,11 +149,20 @@ function AddLog() {
       const processedData = {
         ...formData,
         userId: 1,
+        aircraft_type: formData.aircraft_type.id,
+        route_data: formData.route_data.map(stop => ({
+          type: stop.type,
+          airport_id: stop.airport_id,
+          is_custom: stop.is_custom,
+          custom_name: stop.custom_name
+        }))
       };
 
       numericFields.forEach(field => {
         processedData[field] = parseFloat(formData[field]) || 0;
       });
+      console.log('Form data:', formData);
+      console.log('Processed data:', processedData);
 
       await axios.post(`${config.apiUrl}/api/logbook`, processedData);
       navigate('/logbook');
@@ -196,10 +217,7 @@ function AddLog() {
                         }
                       }}
                       onChange={(event, newValue) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          aircraft_type: newValue ? newValue.designator : ''
-                        }));
+                        handleAircraftSelect(newValue);
                       }}
                       loading={loading}
                       renderOption={(props, option) => (
@@ -273,7 +291,7 @@ function AddLog() {
                             getOptionLabel={(option) => 
                               option ? `${option.icao} - ${option.airport_name}` : ''
                             }
-                            value={airportOptions.find(opt => opt.id === stop.airport_id) || null}
+                            value={stop.airport_data || null}
                             onChange={(_, newValue) => handleRouteChange(index, newValue)}
                             onInputChange={(_, newInputValue) => {
                               if (newInputValue.length >= 2) {
