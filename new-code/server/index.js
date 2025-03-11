@@ -151,9 +151,16 @@ app.get('/api/logbook/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const query = `
-      SELECT * FROM logbook_entries 
-      WHERE user_id = $1 
-      ORDER BY flight_date DESC;
+      SELECT l.*, 
+             ua.aircraft_model, 
+             ua.aircraft_manufacturer, 
+             ua.aircraft_designator,
+             ua.aircraft_wtc,
+             ua.aircraft_class
+      FROM logbook_entries l
+      JOIN user_aircraft ua ON l.user_id = ua.user_id AND l.aircraft_reg = ua.aircraft_reg
+      WHERE l.user_id = $1
+      ORDER BY l.flight_date DESC;
     `;
     const result = await pool.query(query, [userId]);
     res.json(result.rows);
@@ -169,7 +176,6 @@ app.post('/api/logbook', async (req, res) => {
     const {
       userId,
       flight_date,
-      aircraft_type,
       aircraft_reg,
       pilot_in_command,
       other_crew,
@@ -190,17 +196,16 @@ app.post('/api/logbook', async (req, res) => {
 
     const query = `
       INSERT INTO logbook_entries (
-        flight_date, aircraft_type, aircraft_reg, pilot_in_command, other_crew, 
+        flight_date, aircraft_reg, pilot_in_command, other_crew, 
         route_data, details, engine_type, icus_day, icus_night, dual_day, dual_night,
         command_day, command_night, co_pilot_day, co_pilot_night,
         instrument_flight, instrument_sim, user_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *;
     `;
 
     const values = [
       flight_date,
-      aircraft_type,
       aircraft_reg,
       pilot_in_command,
       other_crew || null,
@@ -469,6 +474,64 @@ app.get('/api/airports/search', async (req, res) => {
   } catch (err) {
     console.error("Error searching airports:", err);
     res.status(500).json({ error: "Server Error", details: err.message });
+  }
+});
+
+// Add a custom aircraft for a user
+app.post('/api/user-aircraft', async (req, res) => {
+  try {
+    const {
+      userId,
+      aircraft_reg,
+      aircraft_designator,
+      aircraft_manufacturer,
+      aircraft_model,
+      aircraft_wtc,
+      aircraft_category,
+      aircraft_class
+    } = req.body;
+
+    const query = `
+      INSERT INTO user_aircraft (
+        user_id, aircraft_reg, aircraft_designator, aircraft_manufacturer,
+        aircraft_model, aircraft_wtc, aircraft_category, aircraft_class
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *;
+    `;
+
+    const values = [
+      userId,
+      aircraft_reg,
+      aircraft_designator,
+      aircraft_manufacturer,
+      aircraft_model,
+      aircraft_wtc,
+      aircraft_category,
+      aircraft_class
+    ];
+
+    const result = await pool.query(query, values);
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error adding custom aircraft:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+// Get user's aircraft
+app.get('/api/user-aircraft/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const query = `
+      SELECT * FROM user_aircraft
+      WHERE user_id = $1
+      ORDER BY aircraft_reg;
+    `;
+    const result = await pool.query(query, [userId]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching user aircraft:", err);
+    res.status(500).json({ error: "Server Error" });
   }
 });
 

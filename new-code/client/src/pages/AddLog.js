@@ -13,6 +13,11 @@ import {
   Alert,
   Autocomplete,
   IconButton,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,10 +29,15 @@ function AddLog() {
   const [aircraftOptions, setAircraftOptions] = useState([]);
   const [airportOptions, setAirportOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showCustomAircraftFields, setShowCustomAircraftFields] = useState(false);
   const [formData, setFormData] = useState({
     flight_date: '',
     aircraft_type: '',
     aircraft_reg: '',
+    aircraft_model: '',
+    aircraft_manufacturer: '',
+    aircraft_designator: '',
+    aircraft_wtc: '',
     pilot_in_command: '',
     other_crew: '',
     route_data: [
@@ -131,8 +141,38 @@ function AddLog() {
     setFormData(prevData => ({
       ...prevData,
       aircraft_type: selectedAircraft,
-      aircraft_reg: selectedAircraft.registration
+      aircraft_reg: selectedAircraft.registration || ''
     }));
+  };
+
+  const saveCustomAircraft = async () => {
+    try {
+      // Validate custom aircraft fields
+      if (!formData.aircraft_model || !formData.aircraft_manufacturer || 
+          !formData.aircraft_designator || !formData.aircraft_wtc) {
+        setError('Please fill in all aircraft fields');
+        return false;
+      }
+
+      const customAircraftData = {
+        userId: 1, // Replace with actual user ID
+        aircraft_reg: formData.aircraft_reg,
+        aircraft_designator: formData.aircraft_designator,
+        aircraft_manufacturer: formData.aircraft_manufacturer,
+        aircraft_model: formData.aircraft_model,
+        aircraft_wtc: formData.aircraft_wtc,
+        aircraft_category: 'A', // Assuming 'A' for Airplane
+        aircraft_class: formData.engine_type === 'Single-Engine' ? 'S' : 'M'
+      };
+
+      const response = await axios.post(`${config.apiUrl}/api/user-aircraft`, customAircraftData);
+      console.log('Custom aircraft saved:', response.data);
+      return true;
+    } catch (error) {
+      console.error('Error saving custom aircraft:', error);
+      setError('Error saving custom aircraft. Please try again.');
+      return false;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -146,10 +186,16 @@ function AddLog() {
         'instrument_flight', 'instrument_sim'
       ];
 
+      // If using custom aircraft, save it first
+      if (showCustomAircraftFields) {
+        const success = await saveCustomAircraft();
+        if (!success) return;
+      }
+
       const processedData = {
         ...formData,
         userId: 1,
-        aircraft_type: formData.aircraft_type.id,
+        aircraft_reg: formData.aircraft_reg,
         route_data: formData.route_data.map(stop => ({
           type: stop.type,
           airport_id: stop.airport_id,
@@ -161,6 +207,7 @@ function AddLog() {
       numericFields.forEach(field => {
         processedData[field] = parseFloat(formData[field]) || 0;
       });
+      
       console.log('Form data:', formData);
       console.log('Processed data:', processedData);
 
@@ -206,50 +253,153 @@ function AddLog() {
                     />
                   </Grid>
                   
-                  <Grid item xs={6}>
-                    <Autocomplete
-                      options={aircraftOptions}
-                      getOptionLabel={(option) => `${option.model}, ${option.manufacturer.toUpperCase()} - ${option.designator}`}
-                      filterOptions={(options, state) => options}
-                      onInputChange={(event, newInputValue) => {
-                        if (newInputValue && newInputValue.length >= 2) {
-                          searchAircraft(newInputValue);
-                        }
-                      }}
-                      onChange={(event, newValue) => {
-                        handleAircraftSelect(newValue);
-                      }}
-                      loading={loading}
-                      renderOption={(props, option) => (
-                        <li {...props}>
-                          <div>
-                            <strong>{option.model}</strong>, {option.manufacturer.toUpperCase()} - {option.designator}
-                            <span style={{ marginLeft: '8px', color: '#666' }}>
-                              (WTC: {option.wtc})
-                            </span>
-                          </div>
-                        </li>
-                      )}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Aircraft Type"
-                          required
-                          fullWidth
-                        />
-                      )}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={6}>
-                    <TextField
-                      name="aircraft_reg"
-                      label="Aircraft Registration"
-                      value={formData.aircraft_reg}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                    />
+                  <Grid item xs={12}>
+                    <Box sx={{ 
+                      border: 1, 
+                      borderColor: 'divider', 
+                      borderRadius: 1,
+                      p: 2,
+                      mb: 2
+                    }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Aircraft
+                      </Typography>
+                      
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Autocomplete
+                            options={aircraftOptions}
+                            getOptionLabel={(option) => 
+                              `${option.model}, ${option.manufacturer.toUpperCase()} - ${option.designator}`
+                            }
+                            filterOptions={(options) => options}
+                            onInputChange={(event, newInputValue) => {
+                              if (newInputValue && newInputValue.length >= 2) {
+                                searchAircraft(newInputValue);
+                              }
+                            }}
+                            onChange={(event, newValue) => {
+                              setShowCustomAircraftFields(false);
+                              handleAircraftSelect(newValue);
+                            }}
+                            loading={loading}
+                            renderOption={(props, option) => (
+                              <li {...props}>
+                                <div>
+                                  <strong>{option.model}</strong>, {option.manufacturer.toUpperCase()} - {option.designator}
+                                  <span style={{ marginLeft: '8px', color: '#666' }}>
+                                    (WTC: {option.wtc})
+                                  </span>
+                                </div>
+                              </li>
+                            )}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Aircraft Type Search"
+                                required={!showCustomAircraftFields}
+                                fullWidth
+                              />
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <TextField
+                            name="aircraft_reg"
+                            label="Registration"
+                            value={formData.aircraft_reg}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          {!showCustomAircraftFields ? (
+                            <Button
+                              onClick={() => setShowCustomAircraftFields(true)}
+                              color="primary"
+                              sx={{ mt: 1 }}
+                            >
+                              + Add Custom Aircraft Type
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => {
+                                setShowCustomAircraftFields(false);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  aircraft_model: '',
+                                  aircraft_manufacturer: '',
+                                  aircraft_designator: '',
+                                  aircraft_wtc: ''
+                                }));
+                              }}
+                              color="primary"
+                              sx={{ mt: 1 }}
+                            >
+                              - Cancel Custom Aircraft
+                            </Button>
+                          )}
+                        </Grid>
+
+                        {showCustomAircraftFields && (
+                          <>
+                            <Grid item xs={6}>
+                              <TextField
+                                name="aircraft_model"
+                                label="Model"
+                                value={formData.aircraft_model}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                error={!formData.aircraft_model && showCustomAircraftFields}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField
+                                name="aircraft_manufacturer"
+                                label="Manufacturer"
+                                value={formData.aircraft_manufacturer}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                error={!formData.aircraft_manufacturer && showCustomAircraftFields}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField
+                                name="aircraft_designator"
+                                label="Designator"
+                                value={formData.aircraft_designator}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                error={!formData.aircraft_designator && showCustomAircraftFields}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField
+                                select
+                                name="aircraft_wtc"
+                                label="Wake Turbulence Category"
+                                value={formData.aircraft_wtc}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                error={!formData.aircraft_wtc && showCustomAircraftFields}
+                              >
+                                <MenuItem value="L">Light</MenuItem>
+                                <MenuItem value="M">Medium</MenuItem>
+                                <MenuItem value="H">Heavy</MenuItem>
+                                <MenuItem value="J">Super</MenuItem>
+                              </TextField>
+                            </Grid>
+                          </>
+                        )}
+                      </Grid>
+                    </Box>
                   </Grid>
 
                   <Grid item xs={6}>
@@ -352,22 +502,6 @@ function AddLog() {
               {/* Right Column */}
               <Grid item xs={12} md={6} sx={{ pl: { md: 3 } }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      name="engine_type"
-                      select
-                      label="Engine Type"
-                      value={formData.engine_type}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                    >
-                      <MenuItem value="Single-Engine">Single-Engine</MenuItem>
-                      <MenuItem value="Multi-Engine">Multi-Engine</MenuItem>
-                    </TextField>
-                  </Grid>
-
-                  {/* Time inputs grid */}
                   <Grid item xs={12}>
                     <Box sx={{ 
                       display: 'grid', 
@@ -486,6 +620,29 @@ function AddLog() {
                       onChange={handleChange}
                       fullWidth
                     />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">Engine Type</FormLabel>
+                      <RadioGroup
+                        row
+                        name="engine_type"
+                        value={formData.engine_type}
+                        onChange={handleChange}
+                      >
+                        <FormControlLabel
+                          value="Single-Engine"
+                          control={<Radio />}
+                          label="Single-Engine (S)"
+                        />
+                        <FormControlLabel
+                          value="Multi-Engine"
+                          control={<Radio />}
+                          label="Multi-Engine (M)"
+                        />
+                      </RadioGroup>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </Grid>

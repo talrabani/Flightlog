@@ -12,29 +12,29 @@ Table users {
   status varchar [default: 'active']
 }
 
-Table airports {
-  id integer [primary key]
-  iata varchar(3)
-  icao varchar(4) [unique]
-  airport_name varchar [not null]
-  country_code varchar(2)
-  region_name varchar
-  latitude decimal(10,7)
-  longitude decimal(10,7)
+Table user_aircraft {
+  user_id integer [ref: > users.id, not null]
+  aircraft_reg varchar [not null]
+  aircraft_designator varchar [not null]
+  aircraft_manufacturer varchar [not null] 
+  aircraft_model varchar [not null]
+  aircraft_wtc char [not null]
+  aircraft_category varchar [not null]
+  aircraft_class varchar [not null]
   created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  updated_at timestamp
 
   indexes {
-    icao [name: 'idx_airports_icao']
-    iata [name: 'idx_airports_iata']
+    (user_id, aircraft_reg) [pk]
+    aircraft_designator [name: 'idx_user_aircraft_designator']
   }
 }
 
+
 Table logbook_entries {
   id integer [primary key]
-  user_id integer [ref: > users.id]
+  user_id integer [not null]
   flight_date date [not null]
-  aircraft_type integer [ref: > aircraft_types.id]
   aircraft_reg varchar [not null]
   pilot_in_command varchar [not null]
   other_crew varchar
@@ -56,9 +56,12 @@ Table logbook_entries {
 
   indexes {
     (user_id, flight_date) [name: 'idx_logbook_user_date']
-    aircraft_type [name: 'idx_logbook_aircraft']
+    (user_id, aircraft_reg) [name: 'idx_logbook_aircraft']
     route_data [type: gin, name: 'idx_route_data'] // GIN index for JSONB querying
   }
+
+  // Define the foreign key relationship separately
+  Ref: (user_id, aircraft_reg) > user_aircraft.(user_id, aircraft_reg)
 }
 
 Table aircraft_types {
@@ -72,5 +75,24 @@ Table aircraft_types {
 
   indexes {
     designator [unique]
+  }
+}
+
+
+Table airports {
+  id integer [primary key]
+  iata varchar(3)
+  icao varchar(4) [unique]
+  airport_name varchar [not null]
+  country_code varchar(2)
+  region_name varchar
+  latitude decimal(10,7)
+  longitude decimal(10,7)
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    icao [name: 'idx_airports_icao']
+    iata [name: 'idx_airports_iata']
   }
 }

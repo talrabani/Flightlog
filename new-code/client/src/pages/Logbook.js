@@ -38,6 +38,109 @@ function Logbook() {
     return values.reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
   };
 
+  const columns = [
+    {
+      field: 'flight_date',
+      headerName: 'Date',
+      width: 110,
+      valueFormatter: (params) => {
+        return new Date(params.value).toLocaleDateString();
+      }
+    },
+    {
+      field: 'aircraft_info',
+      headerName: 'Aircraft',
+      width: 200,
+      valueGetter: (params) => {
+        return `${params.row.aircraft_model} (${params.row.aircraft_reg})`;
+      }
+    },
+    {
+      field: 'route',
+      headerName: 'Route',
+      width: 150,
+      valueGetter: (params) => {
+        const routeData = params.row.route_data || [];
+        if (!routeData.length) return '';
+        
+        const airports = routeData.map(stop => {
+          if (stop.is_custom) return stop.custom_name;
+          return stop.airport_data ? stop.airport_data.icao || stop.airport_data.iata : '';
+        });
+        
+        return airports.join(' → ');
+      }
+    },
+    {
+      field: 'total_time',
+      headerName: 'Total Time',
+      width: 100,
+      valueGetter: (params) => {
+        const totalDay = calculateTotal([
+          params.row.icus_day,
+          params.row.dual_day,
+          params.row.command_day,
+          params.row.co_pilot_day
+        ]);
+        
+        const totalNight = calculateTotal([
+          params.row.icus_night,
+          params.row.dual_night,
+          params.row.command_night,
+          params.row.co_pilot_night
+        ]);
+        
+        const totalInstrument = calculateTotal([
+          params.row.instrument_flight,
+          params.row.instrument_sim
+        ]);
+
+        const totalTime = totalDay + totalNight + totalInstrument;
+        return totalTime.toFixed(1);
+      }
+    },
+    {
+      field: 'day',
+      headerName: 'Day',
+      width: 100,
+      valueGetter: (params) => {
+        const totalDay = calculateTotal([
+          params.row.icus_day,
+          params.row.dual_day,
+          params.row.command_day,
+          params.row.co_pilot_day
+        ]);
+        return totalDay.toFixed(1);
+      }
+    },
+    {
+      field: 'night',
+      headerName: 'Night',
+      width: 100,
+      valueGetter: (params) => {
+        const totalNight = calculateTotal([
+          params.row.icus_night,
+          params.row.dual_night,
+          params.row.command_night,
+          params.row.co_pilot_night
+        ]);
+        return totalNight.toFixed(1);
+      }
+    },
+    {
+      field: 'instrument',
+      headerName: 'Instrument',
+      width: 100,
+      valueGetter: (params) => {
+        const totalInstrument = calculateTotal([
+          params.row.instrument_flight,
+          params.row.instrument_sim
+        ]);
+        return totalInstrument.toFixed(1);
+      }
+    },
+  ];
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
@@ -58,14 +161,9 @@ function Logbook() {
           <Table sx={{ minWidth: 650 }} aria-label="flight logbook">
             <TableHead>
               <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Aircraft Type</TableCell>
-                <TableCell>Registration</TableCell>
-                <TableCell>Route</TableCell>
-                <TableCell>Total Time</TableCell>
-                <TableCell>Day</TableCell>
-                <TableCell>Night</TableCell>
-                <TableCell>Instrument</TableCell>
+                {columns.map((column) => (
+                  <TableCell key={column.field}>{column.headerName}</TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -93,14 +191,11 @@ function Logbook() {
 
                 return (
                   <TableRow key={entry.id}>
-                    <TableCell>{new Date(entry.flight_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{entry.aircraft_type}</TableCell>
-                    <TableCell>{entry.aircraft_reg}</TableCell>
-                    <TableCell>{entry.route}</TableCell>
-                    <TableCell>{totalTime.toFixed(1)}</TableCell>
-                    <TableCell>{totalDay.toFixed(1)}</TableCell>
-                    <TableCell>{totalNight.toFixed(1)}</TableCell>
-                    <TableCell>{totalInstrument.toFixed(1)}</TableCell>
+                    {columns.map((column) => (
+                      <TableCell key={column.field}>
+                        {column.valueGetter ? column.valueGetter({ row: entry }) : entry[column.field]}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 );
               })}
