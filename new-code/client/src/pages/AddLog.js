@@ -35,7 +35,6 @@ function AddLog() {
       { type: 'arrival', airport_id: null, airport_data: null, is_custom: false, custom_name: null }
     ],
     details: '',
-    engine_type: 'Single-Engine',
     icus_day: '0',
     icus_night: '0',
     dual_day: '0',
@@ -113,7 +112,7 @@ function AddLog() {
           <form onSubmit={handleSubmit}>
             <Grid container spacing={4}>
               {/* Left Column */}
-              <Grid item xs={12} md={6} sx={{ pr: { md: 3 } }}>
+              <Grid item xs={12} md={5} sx={{ pr: { md: 3 } }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
@@ -167,7 +166,7 @@ function AddLog() {
               </Grid>
 
               {/* Right Column */}
-              <Grid item xs={12} md={6} sx={{ pl: { md: 3 } }}>
+              <Grid item xs={12} md={7} sx={{ pl: { md: 3 } }}>
                 <FlightHoursInput 
                   formData={formData} 
                   handleChange={handleChange} 

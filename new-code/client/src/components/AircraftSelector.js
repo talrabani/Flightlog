@@ -42,6 +42,17 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
       }, 500); // 500ms delay to prevent too many API calls
     } else {
       setAircraftFound(false);
+      // Clear aircraft fields when registration is cleared
+      setFormData(prev => ({
+        ...prev,
+        aircraft_model: '',
+        aircraft_manufacturer: '',
+        aircraft_designator: '',
+        aircraft_wtc: '',
+        aircraft_category: 'A',
+        aircraft_class: 'S',
+        engine_type: ''
+      }));
     }
     
     // Cleanup function to clear timeout when component unmounts or effect reruns
@@ -62,6 +73,14 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
     // If the registration field is changed, reset the aircraft found state
     if (name === 'aircraft_reg') {
       setAircraftFound(false);
+    }
+    
+    // If changing the aircraft class, update engine type in uppercase
+    if (name === 'aircraft_class') {
+      setFormData(prev => ({
+        ...prev,
+        engine_type: value === 'S' ? 'SINGLE-ENGINE' : 'MULTI-ENGINE'
+      }));
     }
   };
 
@@ -128,7 +147,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
           aircraft_wtc: aircraft.aircraft_wtc,
           aircraft_category: aircraft.aircraft_category,
           aircraft_class: aircraft.aircraft_class,
-          engine_type: aircraft.aircraft_class === 'S' ? 'Single-Engine' : 'Multi-Engine'
+          engine_type: aircraft.aircraft_class === 'S' ? 'SINGLE-ENGINE' : 'MULTI-ENGINE'
         }));
       } else {
         setAircraftFound(false);
@@ -140,7 +159,8 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
           aircraft_designator: '',
           aircraft_wtc: '',
           aircraft_category: 'A',
-          aircraft_class: 'S'
+          aircraft_class: 'S',
+          engine_type: ''
         }));
       }
     } catch (error) {
@@ -154,7 +174,8 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
         aircraft_designator: '',
         aircraft_wtc: '',
         aircraft_category: 'A',
-        aircraft_class: 'S'
+        aircraft_class: 'S',
+        engine_type: ''
       }));
     } finally {
       setSearchingAircraft(false);
@@ -178,7 +199,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
         aircraft_model: formData.aircraft_model,
         aircraft_wtc: formData.aircraft_wtc,
         aircraft_category: formData.aircraft_category || 'A', // Assuming 'A' for Airplane
-        aircraft_class: formData.engine_type === 'Single-Engine' ? 'S' : 'M'
+        aircraft_class: formData.engine_type === 'SINGLE-ENGINE' ? 'S' : 'M'
       };
 
       const response = await axios.post(`${config.apiUrl}/api/user-aircraft`, customAircraftData);
@@ -357,10 +378,10 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   value={formData.aircraft_class}
                   onChange={(e) => {
                     handleChange(e);
-                    // Update engine type based on class
+                    // Update engine type based on class - now in uppercase
                     setFormData(prev => ({
                       ...prev,
-                      engine_type: e.target.value === 'S' ? 'Single-Engine' : 'Multi-Engine'
+                      engine_type: e.target.value === 'S' ? 'SINGLE-ENGINE' : 'MULTI-ENGINE'
                     }));
                   }}
                   fullWidth
