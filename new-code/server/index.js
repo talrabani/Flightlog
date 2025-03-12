@@ -535,5 +535,26 @@ app.get('/api/user-aircraft/:userId', async (req, res) => {
   }
 });
 
+// Get user aircraft by registration
+app.get('/api/user-aircraft/:userId/registration/:registration', async (req, res) => {
+  try {
+    const { userId, registration } = req.params;
+    const query = `
+      SELECT * FROM user_aircraft
+      WHERE user_id = $1 AND LOWER(aircraft_reg) = LOWER($2);
+    `;
+    const result = await pool.query(query, [userId, registration]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ found: false, message: "Aircraft registration not found" });
+    }
+    
+    res.json({ found: true, aircraft: result.rows[0] });
+  } catch (err) {
+    console.error("Error fetching user aircraft by registration:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

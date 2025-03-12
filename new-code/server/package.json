@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "seed": "node db/seed-db.js",
-    "test-data": "python db/data/insert_test_data.py"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
