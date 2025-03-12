@@ -17,6 +17,7 @@ import {
   CircularProgress,
   Autocomplete,
 } from '@mui/material';
+import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import config from '../config';
 
 const AircraftSelector = ({ formData, setFormData, setError }) => {
@@ -219,9 +220,12 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
       borderColor: 'divider', 
       borderRadius: 1,
       p: 2,
-      mb: 2
+      mb: 2,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      backgroundColor: '#f8f9fa'
     }}>
-      <Typography variant="subtitle1" gutterBottom>
+      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <AirplanemodeActiveIcon color="primary" />
         Aircraft
       </Typography>
       
@@ -236,6 +240,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
               fullWidth
               required
               helperText={searchingAircraft ? "Checking registration..." : ""}
+              sx={{ backgroundColor: 'white' }}
             />
             {searchingAircraft && (
               <CircularProgress
@@ -253,7 +258,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
 
         {aircraftFound && (
           <Grid item xs={12}>
-            <TableContainer component={Paper} variant="outlined">
+            <TableContainer component={Paper} variant="outlined" sx={{ boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <Table size="small">
                 <TableBody>
                   <TableRow>
@@ -328,6 +333,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                           </>
                         ),
                       }}
+                      sx={{ backgroundColor: 'white' }}
                     />
                   )}
                 />
@@ -342,6 +348,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   fullWidth
                   required
                   error={!formData.aircraft_model}
+                  sx={{ backgroundColor: 'white' }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -353,6 +360,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   fullWidth
                   required
                   error={!formData.aircraft_manufacturer}
+                  sx={{ backgroundColor: 'white' }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -364,6 +372,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   onChange={handleChange}
                   fullWidth
                   required
+                  sx={{ backgroundColor: 'white' }}
                 >
                   <MenuItem value="A">Airplane</MenuItem>
                   <MenuItem value="H">Helicopter</MenuItem>
@@ -386,6 +395,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   }}
                   fullWidth
                   required
+                  sx={{ backgroundColor: 'white' }}
                 >
                   <MenuItem value="S">Single-Engine</MenuItem>
                   <MenuItem value="M">Multi-Engine</MenuItem>
@@ -400,6 +410,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   fullWidth
                   required
                   error={!formData.aircraft_designator}
+                  sx={{ backgroundColor: 'white' }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -412,6 +423,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                   fullWidth
                   required
                   error={!formData.aircraft_wtc}
+                  sx={{ backgroundColor: 'white' }}
                 >
                   <MenuItem value="L">Light</MenuItem>
                   <MenuItem value="M">Medium</MenuItem>

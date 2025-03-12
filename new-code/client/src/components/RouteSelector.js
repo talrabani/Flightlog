@@ -7,9 +7,11 @@ import {
   Box,
   Autocomplete,
   IconButton,
+  Grid,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import config from '../config';
 
 const RouteSelector = ({ formData, setFormData }) => {
@@ -74,9 +76,13 @@ const RouteSelector = ({ formData, setFormData }) => {
       border: 1, 
       borderColor: 'divider', 
       borderRadius: 1,
-      p: 2
+      p: 2,
+      mb: 2,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      backgroundColor: '#f8f9fa'
     }}>
-      <Typography variant="subtitle1" gutterBottom>
+      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <FlightTakeoffIcon color="primary" />
         Routes
       </Typography>
       

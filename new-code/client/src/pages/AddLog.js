@@ -14,7 +14,11 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Stack,
 } from '@mui/material';
+import FlightIcon from '@mui/icons-material/Flight';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import NoteIcon from '@mui/icons-material/Note';
 import config from '../config';
 import AircraftSelector from '../components/AircraftSelector';
 import RouteSelector from '../components/RouteSelector';
@@ -101,15 +105,27 @@ function AddLog() {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/logbook');
+  };
+
   return (
-    <Container maxWidth={false} sx={{ width: '95%' }}>
+    <Container maxWidth={false} sx={{ width: '95%', backgroundColor: '#f5f5f5', py: 3, minHeight: '100vh' }}>
       <Box sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Add Flight Log Entry
+        <Typography variant="h4" gutterBottom align="center" sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          gap: 1,
+          mb: 3
+        }}>
+          <FlightIcon fontSize="large" color="primary" />
+          Log Flight
         </Typography>
         <Paper sx={{ 
           p: 4, 
           maxWidth: '100%',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
           '& .MuiGrid-container': {
             width: '100%',
             margin: 0
@@ -122,16 +138,31 @@ function AddLog() {
               <Grid item xs={12} md={5} sx={{ pr: { md: 3 } }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <TextField
-                      name="flight_date"
-                      label="Date"
-                      type="date"
-                      value={formData.flight_date}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      InputLabelProps={{ shrink: true }}
-                    />
+                    <Box sx={{ 
+                      border: 1, 
+                      borderColor: 'divider', 
+                      borderRadius: 1,
+                      p: 2,
+                      mb: 2,
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      backgroundColor: '#f8f9fa'
+                    }}>
+                      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CalendarTodayIcon color="primary" />
+                        Date
+                      </Typography>
+                      <TextField
+                        name="flight_date"
+                        label="Flight Date"
+                        type="date"
+                        value={formData.flight_date}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ backgroundColor: 'white' }}
+                      />
+                    </Box>
                   </Grid>
                   
                   <Grid item xs={12}>
@@ -165,69 +196,96 @@ function AddLog() {
                   handleChange={handleChange} 
                 />
 
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel id="flight-type-label">Flight Type</InputLabel>
-                      <Select
-                        labelId="flight-type-label"
-                        name="flight_type"
-                        value={formData.flight_type}
+                <Box sx={{ 
+                  border: 1, 
+                  borderColor: 'divider', 
+                  borderRadius: 1,
+                  p: 2,
+                  mb: 2,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  backgroundColor: '#f8f9fa'
+                }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <NoteIcon color="primary" />
+                    Additional Information
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="flight-type-label">Flight Type</InputLabel>
+                        <Select
+                          labelId="flight-type-label"
+                          name="flight_type"
+                          value={formData.flight_type}
+                          onChange={handleChange}
+                          label="Flight Type"
+                          sx={{ backgroundColor: 'white' }}
+                        >
+                          <MenuItem value=""><em>None</em></MenuItem>
+                          <MenuItem value="training">Training</MenuItem>
+                          <MenuItem value="commercial">Commercial</MenuItem>
+                          <MenuItem value="private">Private</MenuItem>
+                          <MenuItem value="checkride">Checkride</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    
+                    <Grid item xs={6}>
+                      <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="flight-rule-label">Flight Rule</InputLabel>
+                        <Select
+                          labelId="flight-rule-label"
+                          name="flight_rule"
+                          value={formData.flight_rule}
+                          onChange={handleChange}
+                          label="Flight Rule"
+                          sx={{ backgroundColor: 'white' }}
+                        >
+                          <MenuItem value=""><em>None</em></MenuItem>
+                          <MenuItem value="VFR">VFR</MenuItem>
+                          <MenuItem value="IFR">IFR</MenuItem>
+                          <MenuItem value="SVFR">Special VFR</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    
+                    <Grid item xs={12}>
+                      <TextField
+                        name="details"
+                        label="Details"
+                        multiline
+                        rows={4}
+                        value={formData.details}
                         onChange={handleChange}
-                        label="Flight Type"
-                      >
-                        <MenuItem value=""><em>None</em></MenuItem>
-                        <MenuItem value="training">Training</MenuItem>
-                        <MenuItem value="commercial">Commercial</MenuItem>
-                        <MenuItem value="private">Private</MenuItem>
-                        <MenuItem value="checkride">Checkride</MenuItem>
-                      </Select>
-                    </FormControl>
+                        fullWidth
+                        sx={{ backgroundColor: 'white' }}
+                      />
+                    </Grid>
                   </Grid>
-                  
-                  <Grid item xs={6}>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel id="flight-rule-label">Flight Rule</InputLabel>
-                      <Select
-                        labelId="flight-rule-label"
-                        name="flight_rule"
-                        value={formData.flight_rule}
-                        onChange={handleChange}
-                        label="Flight Rule"
-                      >
-                        <MenuItem value=""><em>None</em></MenuItem>
-                        <MenuItem value="VFR">VFR</MenuItem>
-                        <MenuItem value="IFR">IFR</MenuItem>
-                        <MenuItem value="SVFR">Special VFR</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <TextField
-                      name="details"
-                      label="Details"
-                      multiline
-                      rows={4}
-                      value={formData.details}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
+                </Box>
               </Grid>
 
               <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size="large"
-                  sx={{ mt: 2 }}
-                >
-                  Add Flight Log Entry
-                </Button>
+                <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    size="large"
+                    onClick={handleCancel}
+                    sx={{ flex: 1, color: 'gray', borderColor: 'gray' }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    sx={{ flex: 1 }}
+                  >
+                    Log Flight
+                  </Button>
+                </Stack>
               </Grid>
             </Grid>
           </form>

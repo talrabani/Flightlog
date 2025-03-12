@@ -12,6 +12,7 @@ import {
   Grid,
   InputBase,
 } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const FlightHoursInput = ({ formData, handleChange }) => {
   // State to track the displayed engine type
@@ -43,6 +44,19 @@ const FlightHoursInput = ({ formData, handleChange }) => {
     }
   };
 
+  // Style for vertical text
+  const verticalTextStyle = {
+    writingMode: 'vertical-rl',
+    transform: 'rotate(180deg)',
+    whiteSpace: 'nowrap',
+    textAlign: 'center',
+    height: '80px',
+    fontWeight: 'bold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -51,13 +65,16 @@ const FlightHoursInput = ({ formData, handleChange }) => {
           borderColor: 'divider', 
           borderRadius: 1,
           p: 2,
-          mb: 2
+          mb: 2,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: '#f8f9fa'
         }}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AccessTimeIcon color="primary" />
             Flight Hours
           </Typography>
           
-          <TableContainer component={Paper} variant="outlined">
+          <TableContainer component={Paper} variant="outlined" sx={{ boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <Table size="small" sx={{ tableLayout: 'fixed' }}>
               <TableHead>
                 <TableRow>
@@ -88,45 +105,45 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                     &nbsp;
                   </TableCell>
                 </TableRow>
-                <TableRow>
+                <TableRow sx={{ height: '90px' }}>
                   {/* ICUS */}
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    DAY
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>DAY</div>
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    NIGHT
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>NIGHT</div>
                   </TableCell>
                   
                   {/* DUAL */}
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    DAY
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>DAY</div>
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    NIGHT
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>NIGHT</div>
                   </TableCell>
                   
                   {/* COMMAND */}
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    DAY
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>DAY</div>
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    NIGHT
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>NIGHT</div>
                   </TableCell>
                   
                   {/* CO-PILOT */}
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    DAY
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>DAY</div>
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    NIGHT
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>NIGHT</div>
                   </TableCell>
                   
                   {/* INSTRUMENT */}
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    IN FLIGHT
+                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
+                    <div style={verticalTextStyle}>IN FLIGHT</div>
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                    IN SIM
+                  <TableCell align="center" sx={{ p: 0 }}>
+                    <div style={verticalTextStyle}>IN SIM</div>
                   </TableCell>
                 </TableRow>
               </TableHead>

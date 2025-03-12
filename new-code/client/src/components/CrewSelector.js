@@ -5,6 +5,7 @@ import {
   Box,
   Grid,
 } from '@mui/material';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 const CrewSelector = ({ formData, handleChange }) => {
   return (
@@ -13,9 +14,12 @@ const CrewSelector = ({ formData, handleChange }) => {
       borderColor: 'divider', 
       borderRadius: 1,
       p: 2,
-      mb: 2
+      mb: 2,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      backgroundColor: '#f8f9fa'
     }}>
-      <Typography variant="subtitle1" gutterBottom>
+      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <BadgeIcon color="primary" />
         Pilots
       </Typography>
       
@@ -28,6 +32,7 @@ const CrewSelector = ({ formData, handleChange }) => {
             onChange={handleChange}
             fullWidth
             required
+            sx={{ backgroundColor: 'white' }}
           />
         </Grid>
 
@@ -38,6 +43,7 @@ const CrewSelector = ({ formData, handleChange }) => {
             value={formData.other_crew}
             onChange={handleChange}
             fullWidth
+            sx={{ backgroundColor: 'white' }}
           />
         </Grid>
       </Grid>

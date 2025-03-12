@@ -69,6 +69,8 @@ CREATE TABLE logbook_entries (
     co_pilot_night NUMERIC(3,1) NOT NULL DEFAULT 0,
     instrument_flight NUMERIC(3,1) NOT NULL DEFAULT 0,
     instrument_sim NUMERIC(3,1) NOT NULL DEFAULT 0,
+    flight_type VARCHAR(20),
+    flight_rule VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

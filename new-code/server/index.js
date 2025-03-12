@@ -182,6 +182,8 @@ app.post('/api/logbook', async (req, res) => {
       route_data,
       details,
       engine_type,
+      flight_type,
+      flight_rule,
       icus_day,
       icus_night,
       dual_day,
@@ -197,10 +199,11 @@ app.post('/api/logbook', async (req, res) => {
     const query = `
       INSERT INTO logbook_entries (
         flight_date, aircraft_reg, pilot_in_command, other_crew, 
-        route_data, details, engine_type, icus_day, icus_night, dual_day, dual_night,
+        route_data, details, engine_type, flight_type, flight_rule,
+        icus_day, icus_night, dual_day, dual_night,
         command_day, command_night, co_pilot_day, co_pilot_night,
         instrument_flight, instrument_sim, user_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       RETURNING *;
     `;
 
@@ -212,6 +215,8 @@ app.post('/api/logbook', async (req, res) => {
       JSON.stringify(route_data),
       details || null,
       engine_type,
+      flight_type || null,
+      flight_rule || null,
       icus_day || 0,
       icus_night || 0,
       dual_day || 0,
