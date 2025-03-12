@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  TextField,
   Box,
   Typography,
   Paper,
@@ -347,19 +346,6 @@ const FlightHoursInput = ({ formData, handleChange }) => {
             </Table>
           </TableContainer>
         </Box>
-      </Grid>
-
-      {/* Details */}
-      <Grid item xs={12}>
-        <TextField
-          name="details"
-          label="Details"
-          multiline
-          rows={4}
-          value={formData.details}
-          onChange={handleChange}
-          fullWidth
-        />
       </Grid>
     </Grid>
   );

@@ -10,11 +10,16 @@ import {
   Typography,
   Box,
   Alert,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import config from '../config';
 import AircraftSelector from '../components/AircraftSelector';
 import RouteSelector from '../components/RouteSelector';
 import FlightHoursInput from '../components/FlightHoursInput';
+import CrewSelector from '../components/CrewSelector';
 
 function AddLog() {
   const navigate = useNavigate();
@@ -35,6 +40,8 @@ function AddLog() {
       { type: 'arrival', airport_id: null, airport_data: null, is_custom: false, custom_name: null }
     ],
     details: '',
+    flight_type: '', // New field for flight type
+    flight_rule: '', // New field for flight rule
     icus_day: '0',
     icus_night: '0',
     dual_day: '0',
@@ -135,24 +142,10 @@ function AddLog() {
                     />
                   </Grid>
 
-                  <Grid item xs={6}>
-                    <TextField
-                      name="pilot_in_command"
-                      label="Pilot in Command"
-                      value={formData.pilot_in_command}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <TextField
-                      name="other_crew"
-                      label="Other Crew"
-                      value={formData.other_crew}
-                      onChange={handleChange}
-                      fullWidth
+                  <Grid item xs={12}>
+                    <CrewSelector
+                      formData={formData}
+                      handleChange={handleChange}
                     />
                   </Grid>
 
@@ -171,6 +164,57 @@ function AddLog() {
                   formData={formData} 
                   handleChange={handleChange} 
                 />
+
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="flight-type-label">Flight Type</InputLabel>
+                      <Select
+                        labelId="flight-type-label"
+                        name="flight_type"
+                        value={formData.flight_type}
+                        onChange={handleChange}
+                        label="Flight Type"
+                      >
+                        <MenuItem value=""><em>None</em></MenuItem>
+                        <MenuItem value="training">Training</MenuItem>
+                        <MenuItem value="commercial">Commercial</MenuItem>
+                        <MenuItem value="private">Private</MenuItem>
+                        <MenuItem value="checkride">Checkride</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  
+                  <Grid item xs={6}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="flight-rule-label">Flight Rule</InputLabel>
+                      <Select
+                        labelId="flight-rule-label"
+                        name="flight_rule"
+                        value={formData.flight_rule}
+                        onChange={handleChange}
+                        label="Flight Rule"
+                      >
+                        <MenuItem value=""><em>None</em></MenuItem>
+                        <MenuItem value="VFR">VFR</MenuItem>
+                        <MenuItem value="IFR">IFR</MenuItem>
+                        <MenuItem value="SVFR">Special VFR</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <TextField
+                      name="details"
+                      label="Details"
+                      multiline
+                      rows={4}
+                      value={formData.details}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
 
               <Grid item xs={12}>
