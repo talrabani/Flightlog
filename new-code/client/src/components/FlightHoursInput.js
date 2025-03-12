@@ -13,6 +13,7 @@ import {
   InputBase,
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import FormBox from './FormBox';
 
 const FlightHoursInput = ({ formData, handleChange }) => {
   // State to track the displayed engine type
@@ -44,325 +45,507 @@ const FlightHoursInput = ({ formData, handleChange }) => {
     }
   };
 
-  // Style for vertical text
-  const verticalTextStyle = {
-    writingMode: 'vertical-rl',
-    transform: 'rotate(180deg)',
-    whiteSpace: 'nowrap',
-    textAlign: 'center',
-    height: '80px',
-    fontWeight: 'bold',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Box sx={{ 
-          border: 1, 
-          borderColor: 'divider', 
-          borderRadius: 1,
-          p: 2,
-          mb: 2,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          backgroundColor: '#f8f9fa'
-        }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AccessTimeIcon color="primary" />
-            Flight Hours
-          </Typography>
-          
+        <FormBox title="Flight Hours" icon={<AccessTimeIcon color="primary" />}>
           <TableContainer component={Paper} variant="outlined" sx={{ boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <Table size="small" sx={{ tableLayout: 'fixed' }}>
+            <Table size="small" sx={{ 
+              tableLayout: 'fixed', 
+              border: '2px solid black',
+              borderRadius: '10px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: '#f8f9fa'
+            }}>
               <TableHead>
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ fontWeight: 'bold', borderBottom: 2 }}>
+                  <TableCell colSpan={3} align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderBottom: '1px solid #ccc',
+                    borderRight: '1px solid #ccc',
+                    padding: '8px 4px'
+                  }}>
                     {displayEngineType}
                   </TableCell>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderBottom: 2 }}>
+                  <TableCell rowSpan={2} align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderBottom: '1px solid #ccc',
+                    borderRight: '1px solid #ccc',
+                    padding: '8px 4px',
+                    verticalAlign: 'middle'
+                  }}>
                     CO-PILOT
                   </TableCell>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderBottom: 2 }}>
+                  <TableCell rowSpan={2} align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderBottom: '1px solid #ccc',
+                    padding: '8px 4px',
+                    verticalAlign: 'middle'
+                  }}>
                     INSTRUMENT
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
+                  <TableCell align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderRight: '1px solid #ccc',
+                    padding: '8px 4px'
+                  }}>
                     I.C.U.S.
                   </TableCell>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
+                  <TableCell align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderRight: '1px solid #ccc',
+                    padding: '8px 4px'
+                  }}>
                     DUAL
                   </TableCell>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
+                  <TableCell align="center" sx={{ 
+                    fontWeight: 'bold', 
+                    borderRight: '1px solid #ccc',
+                    padding: '8px 4px'
+                  }}>
                     COMMAND
                   </TableCell>
-                  <TableCell colSpan={2} align="center" sx={{ fontWeight: 'bold', borderRight: 1, borderRightColor: 'divider' }}>
-                    &nbsp;
-                  </TableCell>
-                  <TableCell colSpan={2} align="center">
-                    &nbsp;
-                  </TableCell>
                 </TableRow>
-                <TableRow sx={{ height: '90px' }}>
+                <TableRow>
                   {/* ICUS */}
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>DAY</div>
-                  </TableCell>
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>NIGHT</div>
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold'
+                      }}>
+                        DAY
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        NIGHT
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* DUAL */}
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>DAY</div>
-                  </TableCell>
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>NIGHT</div>
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold'
+                      }}>
+                        DAY
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        NIGHT
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* COMMAND */}
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>DAY</div>
-                  </TableCell>
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>NIGHT</div>
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold'
+                      }}>
+                        DAY
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        NIGHT
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* CO-PILOT */}
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>DAY</div>
-                  </TableCell>
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>NIGHT</div>
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold'
+                      }}>
+                        DAY
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        NIGHT
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* INSTRUMENT */}
-                  <TableCell align="center" sx={{ borderRight: 1, borderRightColor: 'divider', p: 0 }}>
-                    <div style={verticalTextStyle}>IN FLIGHT</div>
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 0 }}>
-                    <div style={verticalTextStyle}>IN SIM</div>
+                  <TableCell sx={{ 
+                    padding: 0
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: 'white' // Changed from blue to white
+                      }}>
+                        IN FLIGHT
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#f0c8a8'
+                      }}>
+                        IN SIM
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
+                <TableRow sx={{ borderBottom: '2px solid black' }}> {/* Thick border for bottom row */}
                   {/* ICUS */}
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider', height: '50px' }}>
-                    <InputBase
-                      name="icus_day"
-                      value={formData.icus_day}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="icus_night"
-                      value={formData.icus_night}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px'
+                      }}>
+                        <InputBase
+                          name="icus_day"
+                          value={formData.icus_day}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        <InputBase
+                          name="icus_night"
+                          value={formData.icus_night}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* DUAL */}
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="dual_day"
-                      value={formData.dual_day}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="dual_night"
-                      value={formData.dual_night}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px'
+                      }}>
+                        <InputBase
+                          name="dual_day"
+                          value={formData.dual_day}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        <InputBase
+                          name="dual_night"
+                          value={formData.dual_night}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* COMMAND */}
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="command_day"
-                      value={formData.command_day}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="command_night"
-                      value={formData.command_night}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px'
+                      }}>
+                        <InputBase
+                          name="command_day"
+                          value={formData.command_day}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        <InputBase
+                          name="command_night"
+                          value={formData.command_night}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* CO-PILOT */}
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="co_pilot_day"
-                      value={formData.co_pilot_day}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="co_pilot_night"
-                      value={formData.co_pilot_night}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
+                  <TableCell sx={{ 
+                    padding: 0, 
+                    borderRight: '1px solid #ccc'
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px'
+                      }}>
+                        <InputBase
+                          name="co_pilot_day"
+                          value={formData.co_pilot_day}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: '#a8d1f0'
+                      }}>
+                        <InputBase
+                          name="co_pilot_night"
+                          value={formData.co_pilot_night}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                   
                   {/* INSTRUMENT */}
-                  <TableCell align="center" sx={{ p: 1, borderRight: 1, borderRightColor: 'divider' }}>
-                    <InputBase
-                      name="instrument_flight"
-                      value={formData.instrument_flight}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center" sx={{ p: 1 }}>
-                    <InputBase
-                      name="instrument_sim"
-                      value={formData.instrument_sim}
-                      onChange={handleDirectInputChange}
-                      inputProps={{ 
-                        style: { textAlign: 'center' },
-                        min: "0",
-                        step: "0.1"
-                      }}
-                      sx={{ 
-                        width: '100%',
-                        height: '100%',
-                        '& input': {
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                        }
-                      }}
-                    />
+                  <TableCell sx={{ 
+                    padding: 0
+                  }}>
+                    <TableRow sx={{ display: 'flex', height: '100%' }}>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderRight: '1px solid #ccc',
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: 'white' // Changed from blue to white
+                      }}>
+                        <InputBase
+                          name="instrument_flight"
+                          value={formData.instrument_flight}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center" sx={{ 
+                        flex: 1, 
+                        borderBottom: 'none',
+                        padding: '8px 4px',
+                        backgroundColor: '#f0c8a8'
+                      }}>
+                        <InputBase
+                          name="instrument_sim"
+                          value={formData.instrument_sim}
+                          onChange={handleDirectInputChange}
+                          inputProps={{ 
+                            style: { textAlign: 'center', fontWeight: 'bold' }, // Bold text
+                            min: "0",
+                            step: "0.1"
+                          }}
+                          sx={{ 
+                            width: '100%',
+                            '& input': {
+                              textAlign: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold' // Bold text
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
-        </Box>
+        </FormBox>
       </Grid>
     </Grid>
   );

@@ -19,6 +19,7 @@ import {
 import FlightIcon from '@mui/icons-material/Flight';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import NoteIcon from '@mui/icons-material/Note';
+import FormBox from '../components/FormBox';
 import config from '../config';
 import AircraftSelector from '../components/AircraftSelector';
 import RouteSelector from '../components/RouteSelector';
@@ -138,19 +139,7 @@ function AddLog() {
               <Grid item xs={12} md={5} sx={{ pr: { md: 3 } }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <Box sx={{ 
-                      border: 1, 
-                      borderColor: 'divider', 
-                      borderRadius: 1,
-                      p: 2,
-                      mb: 2,
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      backgroundColor: '#f8f9fa'
-                    }}>
-                      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CalendarTodayIcon color="primary" />
-                        Date
-                      </Typography>
+                    <FormBox title="Date" icon={<CalendarTodayIcon color="primary" />}>
                       <TextField
                         name="flight_date"
                         label="Flight Date"
@@ -162,7 +151,7 @@ function AddLog() {
                         InputLabelProps={{ shrink: true }}
                         sx={{ backgroundColor: 'white' }}
                       />
-                    </Box>
+                    </FormBox>
                   </Grid>
                   
                   <Grid item xs={12}>
@@ -196,19 +185,7 @@ function AddLog() {
                   handleChange={handleChange} 
                 />
 
-                <Box sx={{ 
-                  border: 1, 
-                  borderColor: 'divider', 
-                  borderRadius: 1,
-                  p: 2,
-                  mb: 2,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  backgroundColor: '#f8f9fa'
-                }}>
-                  <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <NoteIcon color="primary" />
-                    Additional Information
-                  </Typography>
+                <FormBox title="Additional Information" icon={<NoteIcon color="primary" />}>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
                       <FormControl fullWidth sx={{ mb: 2 }}>
@@ -262,7 +239,7 @@ function AddLog() {
                       />
                     </Grid>
                   </Grid>
-                </Box>
+                </FormBox>
               </Grid>
 
               <Grid item xs={12}>

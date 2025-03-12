@@ -18,6 +18,7 @@ import {
   Autocomplete,
 } from '@mui/material';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
+import FormBox from './FormBox';
 import config from '../config';
 
 const AircraftSelector = ({ formData, setFormData, setError }) => {
@@ -215,20 +216,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
   };
 
   return (
-    <Box sx={{ 
-      border: 1, 
-      borderColor: 'divider', 
-      borderRadius: 1,
-      p: 2,
-      mb: 2,
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      backgroundColor: '#f8f9fa'
-    }}>
-      <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <AirplanemodeActiveIcon color="primary" />
-        Aircraft
-      </Typography>
-      
+    <FormBox title="Aircraft" icon={<AirplanemodeActiveIcon color="primary" />}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Box sx={{ position: 'relative' }}>
@@ -446,7 +434,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
           </Grid>
         )}
       </Grid>
-    </Box>
+    </FormBox>
   );
 };
 
