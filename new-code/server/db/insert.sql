@@ -10,7 +10,7 @@ INSERT INTO user_aircraft (
                        
 INSERT INTO logbook_entries (
 user_id, flight_date, aircraft_reg, pilot_in_command, other_crew, 
-route_data, details, engine_type, icus_day, icus_night, dual_day, dual_night, 
+route_data, details, icus_day, icus_night, dual_day, dual_night, 
 command_day, command_night, co_pilot_day, co_pilot_night, instrument_flight, instrument_sim
 ) VALUES
 (1, '2021-03-03', 'VH-TAE', 'E.TSIATSIKAS', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'EOC', 0, 0, 5.9, 0, 0, 0, 0, 0, 0, 0),

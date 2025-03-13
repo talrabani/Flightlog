@@ -25,9 +25,22 @@ function Logbook() {
   const [entries, setEntries] = useState([]);
   const [processedEntries, setProcessedEntries] = useState([]);
   const [viewMode, setViewMode] = useState('modern'); // 'modern' or 'classic'
+  const [airportData, setAirportData] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch airport data for the given IDs
+  const fetchAirportData = async (airportIds) => {
+    try {
+      const response = await axios.post(`${config.apiUrl}/api/airports/batch`, { ids: airportIds });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching airport data:', error);
+      return {};
+    }
+  };
 
   // Process the raw logbook data
-  const processLogbookData = (data) => {
+  const processLogbookData = (data, airports) => {
     return data.map(entry => {
       // Create a new object to avoid mutating the original
       const processedEntry = { ...entry };
@@ -46,9 +59,11 @@ function Logbook() {
             return stop.custom_name;
           }
           
-          if (stop.airport_data) {
+          // Use the airport data from our fetched map
+          const airport = airports[stop.airport_id];
+          if (airport) {
             // Use ICAO if available, otherwise use name
-            return stop.airport_data.icao || stop.airport_data.name || stop.airport_data.iata || '';
+            return airport.icao || airport.airport_name || airport.iata || '';
           }
           
           return '';
@@ -74,25 +89,35 @@ function Logbook() {
       processedEntry.multi_engine_command_night = 0;
 
       // Determine if aircraft is single or multi-engine based on aircraft_class
-      const isMultiEngine = processedEntry.aircraft_class && processedEntry.aircraft_class === 'M';
+      const isMultiEngine = processedEntry.aircraft_class && 
+                           (processedEntry.aircraft_class.toLowerCase().includes('multi') || 
+                            processedEntry.aircraft_class === 'ME' || 
+                            processedEntry.aircraft_class === 'M');
+
+      // Helper function to convert string hours to numbers
+      const parseHours = (value) => {
+        if (value === null || value === undefined) return 0;
+        // Convert string to number, handle both "1.0" and 1.0 formats
+        return typeof value === 'string' ? parseFloat(value) || 0 : value || 0;
+      };
 
       // Allocate hours based on determined engine type
       if (!isMultiEngine) {
         // Single engine (default if not explicitly multi-engine)
-        processedEntry.single_engine_icus_day = processedEntry.icus_day || 0;
-        processedEntry.single_engine_icus_night = processedEntry.icus_night || 0;
-        processedEntry.single_engine_dual_day = processedEntry.dual_day || 0;
-        processedEntry.single_engine_dual_night = processedEntry.dual_night || 0;
-        processedEntry.single_engine_command_day = processedEntry.command_day || 0;
-        processedEntry.single_engine_command_night = processedEntry.command_night || 0;
+        processedEntry.single_engine_icus_day = parseHours(processedEntry.icus_day);
+        processedEntry.single_engine_icus_night = parseHours(processedEntry.icus_night);
+        processedEntry.single_engine_dual_day = parseHours(processedEntry.dual_day);
+        processedEntry.single_engine_dual_night = parseHours(processedEntry.dual_night);
+        processedEntry.single_engine_command_day = parseHours(processedEntry.command_day);
+        processedEntry.single_engine_command_night = parseHours(processedEntry.command_night);
       } else {
         // Multi engine
-        processedEntry.multi_engine_icus_day = processedEntry.icus_day || 0;
-        processedEntry.multi_engine_icus_night = processedEntry.icus_night || 0;
-        processedEntry.multi_engine_dual_day = processedEntry.dual_day || 0;
-        processedEntry.multi_engine_dual_night = processedEntry.dual_night || 0;
-        processedEntry.multi_engine_command_day = processedEntry.command_day || 0;
-        processedEntry.multi_engine_command_night = processedEntry.command_night || 0;
+        processedEntry.multi_engine_icus_day = parseHours(processedEntry.icus_day);
+        processedEntry.multi_engine_icus_night = parseHours(processedEntry.icus_night);
+        processedEntry.multi_engine_dual_day = parseHours(processedEntry.dual_day);
+        processedEntry.multi_engine_dual_night = parseHours(processedEntry.dual_night);
+        processedEntry.multi_engine_command_day = parseHours(processedEntry.command_day);
+        processedEntry.multi_engine_command_night = parseHours(processedEntry.command_night);
       }
 
       return processedEntry;
@@ -100,20 +125,45 @@ function Logbook() {
   };
 
   useEffect(() => {
-    const fetchEntries = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        
+        // Fetch logbook entries
         const response = await axios.get(`${config.apiUrl}/api/logbook/1`);
         setEntries(response.data);
         
-        // Process the data
-        const processed = processLogbookData(response.data);
+        // Extract all unique airport IDs from route data
+        const airportIds = new Set();
+        response.data.forEach(entry => {
+          if (entry.route_data && Array.isArray(entry.route_data)) {
+            entry.route_data.forEach(stop => {
+              if (stop.airport_id) {
+                airportIds.add(stop.airport_id);
+              }
+            });
+          }
+        });
+        
+        // Fetch airport data if we have any airport IDs
+        let airports = {};
+        if (airportIds.size > 0) {
+          airports = await fetchAirportData(Array.from(airportIds));
+          setAirportData(airports);
+        }
+        
+        // Process the data with the fetched airport information
+        const processed = processLogbookData(response.data, airports);
         setProcessedEntries(processed);
+        
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching logbook entries:', error);
+        console.error('Error fetching data:', error);
+        setLoading(false);
       }
     };
 
-    fetchEntries();
+    fetchData();
   }, []);
 
   const handleViewChange = (event, newView) => {
@@ -160,10 +210,14 @@ function Logbook() {
         </Stack>
         
         {/* Render the appropriate table based on the view mode */}
-        {viewMode === 'modern' ? (
-          <LogbookTableModern entries={processedEntries} />
+        {loading ? (
+          <Typography>Loading logbook entries...</Typography>
         ) : (
-          <LogbookTableClassic entries={processedEntries} />
+          viewMode === 'modern' ? (
+            <LogbookTableModern entries={processedEntries} />
+          ) : (
+            <LogbookTableClassic entries={processedEntries} />
+          )
         )}
       </Box>
     </Container>

@@ -181,7 +181,6 @@ app.post('/api/logbook', async (req, res) => {
       other_crew,
       route_data,
       details,
-      engine_type,
       flight_type,
       flight_rule,
       icus_day,
@@ -199,11 +198,11 @@ app.post('/api/logbook', async (req, res) => {
     const query = `
       INSERT INTO logbook_entries (
         flight_date, aircraft_reg, pilot_in_command, other_crew, 
-        route_data, details, engine_type, flight_type, flight_rule,
+        route_data, details, flight_type, flight_rule,
         icus_day, icus_night, dual_day, dual_night,
         command_day, command_night, co_pilot_day, co_pilot_night,
         instrument_flight, instrument_sim, user_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       RETURNING *;
     `;
 
@@ -214,7 +213,6 @@ app.post('/api/logbook', async (req, res) => {
       other_crew || null,
       JSON.stringify(route_data),
       details || null,
-      engine_type,
       flight_type || null,
       flight_rule || null,
       icus_day || 0,
@@ -478,6 +476,66 @@ app.get('/api/airports/search', async (req, res) => {
     res.json(transformedResults);
   } catch (err) {
     console.error("Error searching airports:", err);
+    res.status(500).json({ error: "Server Error", details: err.message });
+  }
+});
+
+// Get airport by ID
+app.get('/api/airports/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const query = `
+      SELECT 
+        id, icao, iata, airport_name, country_code, 
+        region_name, latitude, longitude
+      FROM airports
+      WHERE id = $1;
+    `;
+    
+    const result = await pool.query(query, [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Airport not found" });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error fetching airport by ID:", err);
+    res.status(500).json({ error: "Server Error", details: err.message });
+  }
+});
+
+// Get multiple airports by IDs
+app.post('/api/airports/batch', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "Invalid request. Please provide an array of airport IDs." });
+    }
+    
+    // Create a parameterized query with the correct number of parameters
+    const placeholders = ids.map((_, index) => `$${index + 1}`).join(',');
+    const query = `
+      SELECT 
+        id, icao, iata, airport_name, country_code, 
+        region_name, latitude, longitude
+      FROM airports
+      WHERE id IN (${placeholders});
+    `;
+    
+    const result = await pool.query(query, ids);
+    
+    // Create a map for easy lookup
+    const airportMap = {};
+    result.rows.forEach(airport => {
+      airportMap[airport.id] = airport;
+    });
+    
+    res.json(airportMap);
+  } catch (err) {
+    console.error("Error fetching airports by batch:", err);
     res.status(500).json({ error: "Server Error", details: err.message });
   }
 });

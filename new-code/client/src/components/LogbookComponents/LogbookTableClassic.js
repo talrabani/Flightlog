@@ -249,18 +249,12 @@ const LogbookTableClassic = ({ entries }) => {
               <WrappingCell>{entry.other_crew || (entry.is_self_pic ? 'SELF' : '-')}</WrappingCell>
               
               {/* Route */}
-              <StyledTableCell>
-                {entry.formatted_route || (entry.route_data && entry.route_data.length > 0
-                  ? entry.route_data.map(stop => 
-                      stop.is_custom 
-                        ? stop.custom_name 
-                        : (stop.airport_data ? stop.airport_data.icao || stop.airport_data.iata : '')
-                    ).join('-')
-                  : '-')}
-              </StyledTableCell>
+              <WrappingCell width="125px">
+                {entry.formatted_route ? entry.formatted_route : '-'}
+              </WrappingCell>
               
               {/* Details with thick right border */}
-              <ThickRightBorderCell>{entry.remarks || '-'}</ThickRightBorderCell>
+              <ThickRightBorderCell width="125px">{entry.remarks || '-'}</ThickRightBorderCell>
               
               {/* Single-Engine */}
               <DayCell>{entry.single_engine_icus_day || ''}</DayCell>

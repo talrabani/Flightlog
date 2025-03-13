@@ -72,8 +72,7 @@ CREATE TABLE logbook_entries (
     flight_rule VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id, aircraft_reg) REFERENCES user_aircraft(user_id, aircraft_reg) ON DELETE RESTRICT
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Add indexes
