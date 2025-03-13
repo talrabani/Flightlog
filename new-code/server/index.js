@@ -146,7 +146,7 @@ app.get('/api/statistics/:userId', async (req, res) => {
   }
 });
 
-// Logbook entries route
+// Logbook entries route to get all the log data
 app.get('/api/logbook/:userId', async (req, res) => {
   try {
     const { userId } = req.params;

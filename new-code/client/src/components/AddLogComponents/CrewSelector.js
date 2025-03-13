@@ -9,7 +9,7 @@ import FormBox from './FormBox';
 const CrewSelector = ({ formData, handleChange }) => {
   return (
     <FormBox title="Pilots" icon={<BadgeIcon color="primary" />}>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid item xs={6}>
           <TextField
             name="pilot_in_command"

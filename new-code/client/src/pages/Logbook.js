@@ -4,28 +4,110 @@ import axios from 'axios';
 import {
   Container,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Box,
-  Button
+  Button,
+  ToggleButtonGroup,
+  ToggleButton,
+  Stack
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import config from '../config';
+
+// Import the table components
+import LogbookTableModern from '../components/LogbookComponents/LogbookTableModern';
+import LogbookTableClassic from '../components/LogbookComponents/LogbookTableClassic';
 
 function Logbook() {
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
+  const [processedEntries, setProcessedEntries] = useState([]);
+  const [viewMode, setViewMode] = useState('modern'); // 'modern' or 'classic'
+
+  // Process the raw logbook data
+  const processLogbookData = (data) => {
+    return data.map(entry => {
+      // Create a new object to avoid mutating the original
+      const processedEntry = { ...entry };
+
+      // 1. Format aircraft name: aircraft_model, aircraft_manufacturer.toUpper()
+      if (processedEntry.aircraft_manufacturer) {
+        processedEntry.aircraft_name = `${processedEntry.aircraft_model}, ${processedEntry.aircraft_manufacturer.toUpperCase()}`;
+      } else {
+        processedEntry.aircraft_name = processedEntry.aircraft_model;
+      }
+
+      // 2. Process route data to show ICAO codes or names separated by '-'
+      if (processedEntry.route_data && Array.isArray(processedEntry.route_data)) {
+        processedEntry.formatted_route = processedEntry.route_data.map(stop => {
+          if (stop.is_custom) {
+            return stop.custom_name;
+          }
+          
+          if (stop.airport_data) {
+            // Use ICAO if available, otherwise use name
+            return stop.airport_data.icao || stop.airport_data.name || stop.airport_data.iata || '';
+          }
+          
+          return '';
+        }).filter(Boolean).join('-');
+      } else {
+        processedEntry.formatted_route = '';
+      }
+
+      // 3. Allocate hours based on engine type
+      // Initialize all engine-specific fields to 0
+      processedEntry.single_engine_icus_day = 0;
+      processedEntry.single_engine_icus_night = 0;
+      processedEntry.single_engine_dual_day = 0;
+      processedEntry.single_engine_dual_night = 0;
+      processedEntry.single_engine_command_day = 0;
+      processedEntry.single_engine_command_night = 0;
+      
+      processedEntry.multi_engine_icus_day = 0;
+      processedEntry.multi_engine_icus_night = 0;
+      processedEntry.multi_engine_dual_day = 0;
+      processedEntry.multi_engine_dual_night = 0;
+      processedEntry.multi_engine_command_day = 0;
+      processedEntry.multi_engine_command_night = 0;
+
+      // Determine if aircraft is single or multi-engine based on aircraft_class
+      const isMultiEngine = processedEntry.aircraft_class && processedEntry.aircraft_class === 'M';
+
+      // Allocate hours based on determined engine type
+      if (!isMultiEngine) {
+        // Single engine (default if not explicitly multi-engine)
+        processedEntry.single_engine_icus_day = processedEntry.icus_day || 0;
+        processedEntry.single_engine_icus_night = processedEntry.icus_night || 0;
+        processedEntry.single_engine_dual_day = processedEntry.dual_day || 0;
+        processedEntry.single_engine_dual_night = processedEntry.dual_night || 0;
+        processedEntry.single_engine_command_day = processedEntry.command_day || 0;
+        processedEntry.single_engine_command_night = processedEntry.command_night || 0;
+      } else {
+        // Multi engine
+        processedEntry.multi_engine_icus_day = processedEntry.icus_day || 0;
+        processedEntry.multi_engine_icus_night = processedEntry.icus_night || 0;
+        processedEntry.multi_engine_dual_day = processedEntry.dual_day || 0;
+        processedEntry.multi_engine_dual_night = processedEntry.dual_night || 0;
+        processedEntry.multi_engine_command_day = processedEntry.command_day || 0;
+        processedEntry.multi_engine_command_night = processedEntry.command_night || 0;
+      }
+
+      return processedEntry;
+    });
+  };
 
   useEffect(() => {
     const fetchEntries = async () => {
       try {
         const response = await axios.get(`${config.apiUrl}/api/logbook/1`);
         setEntries(response.data);
+        
+        // Process the data
+        const processed = processLogbookData(response.data);
+        setProcessedEntries(processed);
       } catch (error) {
         console.error('Error fetching logbook entries:', error);
       }
@@ -34,116 +116,15 @@ function Logbook() {
     fetchEntries();
   }, []);
 
-  const calculateTotal = (values) => {
-    return values.reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
+  const handleViewChange = (event, newView) => {
+    if (newView !== null) {
+      setViewMode(newView);
+    }
   };
 
-  const columns = [
-    {
-      field: 'flight_date',
-      headerName: 'Date',
-      width: 110,
-      valueFormatter: (params) => {
-        return new Date(params.value).toLocaleDateString();
-      }
-    },
-    {
-      field: 'aircraft_info',
-      headerName: 'Aircraft',
-      width: 200,
-      valueGetter: (params) => {
-        return `${params.row.aircraft_model} (${params.row.aircraft_reg})`;
-      }
-    },
-    {
-      field: 'route',
-      headerName: 'Route',
-      width: 150,
-      valueGetter: (params) => {
-        const routeData = params.row.route_data || [];
-        if (!routeData.length) return '';
-        
-        const airports = routeData.map(stop => {
-          if (stop.is_custom) return stop.custom_name;
-          return stop.airport_data ? stop.airport_data.icao || stop.airport_data.iata : '';
-        });
-        
-        return airports.join(' → ');
-      }
-    },
-    {
-      field: 'total_time',
-      headerName: 'Total Time',
-      width: 100,
-      valueGetter: (params) => {
-        const totalDay = calculateTotal([
-          params.row.icus_day,
-          params.row.dual_day,
-          params.row.command_day,
-          params.row.co_pilot_day
-        ]);
-        
-        const totalNight = calculateTotal([
-          params.row.icus_night,
-          params.row.dual_night,
-          params.row.command_night,
-          params.row.co_pilot_night
-        ]);
-        
-        const totalInstrument = calculateTotal([
-          params.row.instrument_flight,
-          params.row.instrument_sim
-        ]);
-
-        const totalTime = totalDay + totalNight + totalInstrument;
-        return totalTime.toFixed(1);
-      }
-    },
-    {
-      field: 'day',
-      headerName: 'Day',
-      width: 100,
-      valueGetter: (params) => {
-        const totalDay = calculateTotal([
-          params.row.icus_day,
-          params.row.dual_day,
-          params.row.command_day,
-          params.row.co_pilot_day
-        ]);
-        return totalDay.toFixed(1);
-      }
-    },
-    {
-      field: 'night',
-      headerName: 'Night',
-      width: 100,
-      valueGetter: (params) => {
-        const totalNight = calculateTotal([
-          params.row.icus_night,
-          params.row.dual_night,
-          params.row.command_night,
-          params.row.co_pilot_night
-        ]);
-        return totalNight.toFixed(1);
-      }
-    },
-    {
-      field: 'instrument',
-      headerName: 'Instrument',
-      width: 100,
-      valueGetter: (params) => {
-        const totalInstrument = calculateTotal([
-          params.row.instrument_flight,
-          params.row.instrument_sim
-        ]);
-        return totalInstrument.toFixed(1);
-      }
-    },
-  ];
-
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
+    <Container maxWidth={false} sx={{ px: 2 }}>
+      <Box sx={{ my: 4, width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" gutterBottom>
             Flight Logbook
@@ -157,51 +138,33 @@ function Logbook() {
             Add Entry
           </Button>
         </Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="flight logbook">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell key={column.field}>{column.headerName}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {entries.map((entry) => {
-                const totalDay = calculateTotal([
-                  entry.icus_day,
-                  entry.dual_day,
-                  entry.command_day,
-                  entry.co_pilot_day
-                ]);
-                
-                const totalNight = calculateTotal([
-                  entry.icus_night,
-                  entry.dual_night,
-                  entry.command_night,
-                  entry.co_pilot_night
-                ]);
-                
-                const totalInstrument = calculateTotal([
-                  entry.instrument_flight,
-                  entry.instrument_sim
-                ]);
-
-                const totalTime = totalDay + totalNight + totalInstrument;
-
-                return (
-                  <TableRow key={entry.id}>
-                    {columns.map((column) => (
-                      <TableCell key={column.field}>
-                        {column.valueGetter ? column.valueGetter({ row: entry }) : entry[column.field]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        
+        {/* View Toggle */}
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
+          <Typography variant="body1">View:</Typography>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewChange}
+            aria-label="logbook view mode"
+          >
+            <ToggleButton value="modern" aria-label="modern view">
+              <ViewListIcon sx={{ mr: 1 }} />
+              Modern
+            </ToggleButton>
+            <ToggleButton value="classic" aria-label="classic view">
+              <TableChartIcon sx={{ mr: 1 }} />
+              Classic
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+        
+        {/* Render the appropriate table based on the view mode */}
+        {viewMode === 'modern' ? (
+          <LogbookTableModern entries={processedEntries} />
+        ) : (
+          <LogbookTableClassic entries={processedEntries} />
+        )}
       </Box>
     </Container>
   );

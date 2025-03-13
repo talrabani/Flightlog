@@ -58,7 +58,6 @@ CREATE TABLE logbook_entries (
     other_crew VARCHAR(50),
     route_data JSONB NOT NULL DEFAULT '[]',
     details TEXT,
-    engine_type VARCHAR(20) NOT NULL,
     icus_day NUMERIC(3,1) NOT NULL DEFAULT 0,
     icus_night NUMERIC(3,1) NOT NULL DEFAULT 0,
     dual_day NUMERIC(3,1) NOT NULL DEFAULT 0,

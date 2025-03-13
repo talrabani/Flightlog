@@ -9,7 +9,6 @@ function DateSelector({ formData, handleChange }) {
       <FormBox title="Date" icon={<CalendarTodayIcon color="primary" />}>
         <TextField
           name="flight_date"
-          label="Flight Date"
           type="date"
           sx={{ backgroundColor: 'white' }}
           value={formData.flight_date}

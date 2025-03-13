@@ -13,6 +13,6 @@ user_id, flight_date, aircraft_reg, pilot_in_command, other_crew,
 route_data, details, engine_type, icus_day, icus_night, dual_day, dual_night, 
 command_day, command_night, co_pilot_day, co_pilot_night, instrument_flight, instrument_sim
 ) VALUES
-(1, '2021-03-03', 'VH-TAE', 'E.TSIATSIKAS', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'EOC', 'Single-Engine', 0, 0, 5.9, 0, 0, 0, 0, 0, 0, 0),
-(1, '2021-03-07', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'S+L', 'Single-Engine', 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0),
-(1, '2021-03-14', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'C+D', 'Single-Engine', 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0);
+(1, '2021-03-03', 'VH-TAE', 'E.TSIATSIKAS', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'EOC', 0, 0, 5.9, 0, 0, 0, 0, 0, 0, 0),
+(1, '2021-03-07', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'S+L', 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0),
+(1, '2021-03-14', 'VH-TAE', 'E.LINCOLN-PRICE', 'SELF', '[{"type": "departure", "airport_id": 675, "is_custom": false, "custom_name": null}, {"type": "arrival", "airport_id": 675, "is_custom": false, "custom_name": null}]', 'C+D', 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0);

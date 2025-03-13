@@ -21,6 +21,7 @@ function App() {
           <Route path="/logbook" element={<Logbook />} />
           <Route path="/addlog" element={<AddLog />} />
         </Routes>
+        
       </div>
     </Router>
   );

@@ -125,22 +125,22 @@ function AddLog() {
           Add Log
         </Typography>
         <Paper sx={{ 
-          p: 3, 
+          p: 2,
           maxWidth: '100%',
           backgroundColor: 'white',
           boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-          borderRadius: 0, // Remove border radius to eliminate white corners
+          borderRadius: 0,
           '& .MuiGrid-container': {
             width: '100%',
             margin: 0
           }
         }}>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               {/* Left Column */}
-              <Grid item xs={12} md={5} sx={{ pr: { md: 2 } }}>
-                <Grid container spacing={1}>
+              <Grid item xs={12} md={5} sx={{ pr: { md: 1 } }}>
+                <Grid container spacing={0.5}>
                   <DateSelector formData={formData} handleChange={handleChange} />
                   
                   <Grid item xs={12}>
@@ -168,7 +168,7 @@ function AddLog() {
               </Grid>
 
               {/* Right Column */}
-              <Grid item xs={12} md={7} sx={{ pl: { md: 2 } }}>
+              <Grid item xs={12} md={7} sx={{ pl: { md: 1 } }}>
                 <FlightHoursInput 
                   formData={formData} 
                   handleChange={handleChange} 
