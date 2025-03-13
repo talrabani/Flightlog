@@ -14,11 +14,11 @@ const CrewSelector = ({ formData, handleChange }) => {
           <TextField
             name="pilot_in_command"
             label="Pilot in Command"
+            sx={{ backgroundColor: 'white' }}
             value={formData.pilot_in_command}
             onChange={handleChange}
             fullWidth
             required
-            sx={{ backgroundColor: 'white' }}
           />
         </Grid>
 
@@ -26,10 +26,10 @@ const CrewSelector = ({ formData, handleChange }) => {
           <TextField
             name="other_crew"
             label="Other Crew"
+            sx={{ backgroundColor: 'white' }}
             value={formData.other_crew}
             onChange={handleChange}
             fullWidth
-            sx={{ backgroundColor: 'white' }}
           />
         </Grid>
       </Grid>

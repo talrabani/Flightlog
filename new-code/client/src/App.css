@@ -37,37 +37,4 @@
   }
 }
 
-.navbar {
-  background-color: #1976d2;
-  padding: 1rem;
-  margin-bottom: 2rem;
-}
-
-.navbar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.navbar a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.navbar a:hover {
-  opacity: 0.8;
-}
-
-@media (max-width: 600px) {
-  .navbar ul {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-  }
-}
+/* Removed old navbar styling */

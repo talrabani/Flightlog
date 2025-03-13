@@ -7,13 +7,12 @@ import {
   Box,
   Autocomplete,
   IconButton,
-  Grid,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import FormBox from './FormBox';
-import config from '../config';
+import config from '../../config';
 
 const RouteSelector = ({ formData, setFormData }) => {
   const [airportOptions, setAirportOptions] = useState([]);
@@ -98,6 +97,7 @@ const RouteSelector = ({ formData, setFormData }) => {
             renderInput={(params) => (
               <TextField
                 {...params}
+                sx={{ backgroundColor: 'white' }}
                 label={
                   index === 0 ? "Departure Airport" :
                   index === formData.route_data.length - 1 ? "Arrival Airport" :

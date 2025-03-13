@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Typography,
   Paper,
   Table,
   TableBody,
@@ -61,16 +59,18 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                 <TableRow>
                   <TableCell colSpan={3} align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderBottom: '1px solid #ccc',
-                    borderRight: '1px solid #ccc',
+                    borderBottom: '1px solid black',
+                    borderRight: '2px solid black',
+                    borderLeft: '2px solid black',
                     padding: '8px 4px'
                   }}>
                     {displayEngineType}
                   </TableCell>
                   <TableCell rowSpan={2} align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderBottom: '1px solid #ccc',
-                    borderRight: '1px solid #ccc',
+                    borderBottom: '1px solid black',
+                    borderRight: '2px solid black',
+                    borderLeft: '2px solid black',
                     padding: '8px 4px',
                     verticalAlign: 'middle'
                   }}>
@@ -78,32 +78,33 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   </TableCell>
                   <TableCell rowSpan={2} align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderBottom: '1px solid #ccc',
+                    borderBottom: '1px solid black',
+                    borderLeft: '2px solid black',
                     padding: '8px 4px',
                     verticalAlign: 'middle'
                   }}>
                     INSTRUMENT
                   </TableCell>
                 </TableRow>
-                <TableRow>
+                <TableRow sx={{ height: '20px' }}> {/* 2nd row*/}
                   <TableCell align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderRight: '1px solid #ccc',
-                    padding: '8px 4px'
+                    borderRight: '1px solid black',
+                    padding: '4px'
                   }}>
                     I.C.U.S.
                   </TableCell>
                   <TableCell align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderRight: '1px solid #ccc',
-                    padding: '8px 4px'
+                    borderRight: '1px solid black',
+                    padding: '4px' // Reduced padding
                   }}>
                     DUAL
                   </TableCell>
                   <TableCell align="center" sx={{ 
                     fontWeight: 'bold', 
-                    borderRight: '1px solid #ccc',
-                    padding: '8px 4px'
+                    borderRight: '2px solid black',
+                    padding: '4px' // Reduced padding
                   }}>
                     COMMAND
                   </TableCell>
@@ -112,13 +113,14 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* ICUS */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black',
+                    borderTop: '2px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
-                        borderBottom: 'none',
+                        borderRight: '1px solid black',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold'
                       }}>
@@ -126,7 +128,7 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                       </TableCell>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderBottom: 'none',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
                         backgroundColor: '#a8d1f0'
@@ -139,13 +141,14 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* DUAL */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black',
+                    borderTop: '2px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
-                        borderBottom: 'none',
+                        borderRight: '1px solid black',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold'
                       }}>
@@ -153,7 +156,7 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                       </TableCell>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderBottom: 'none',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
                         backgroundColor: '#a8d1f0'
@@ -166,13 +169,14 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* COMMAND */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '2px solid black',
+                    borderTop: '2px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
-                        borderBottom: 'none',
+                        borderRight: '1px solid black',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold'
                       }}>
@@ -180,7 +184,7 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                       </TableCell>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderBottom: 'none',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
                         backgroundColor: '#a8d1f0'
@@ -193,13 +197,15 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* CO-PILOT */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '2px solid black',
+                    borderLeft: '2px solid black',
+                    borderTop: '2px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
-                        borderBottom: 'none',
+                        borderRight: '1px solid black',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold'
                       }}>
@@ -207,7 +213,7 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                       </TableCell>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderBottom: 'none',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
                         backgroundColor: '#a8d1f0'
@@ -219,22 +225,24 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   
                   {/* INSTRUMENT */}
                   <TableCell sx={{ 
-                    padding: 0
+                    padding: 0,
+                    borderLeft: '2px solid black',
+                    borderTop: '2px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
-                        borderBottom: 'none',
+                        borderRight: '1px solid black',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
-                        backgroundColor: 'white' // Changed from blue to white
+                        backgroundColor: 'white'
                       }}>
                         IN FLIGHT
                       </TableCell>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderBottom: 'none',
+                        borderBottom: '2px solid black',
                         padding: '8px 4px',
                         fontWeight: 'bold',
                         backgroundColor: '#f0c8a8'
@@ -246,16 +254,16 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow sx={{ borderBottom: '2px solid black' }}> {/* Thick border for bottom row */}
+                <TableRow>
                   {/* ICUS */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
+                        borderRight: '1px solid black',
                         borderBottom: 'none',
                         padding: '8px 4px'
                       }}>
@@ -309,12 +317,12 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* DUAL */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
+                        borderRight: '1px solid black',
                         borderBottom: 'none',
                         padding: '8px 4px'
                       }}>
@@ -368,12 +376,12 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* COMMAND */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
+                        borderRight: '1px solid black',
                         borderBottom: 'none',
                         padding: '8px 4px'
                       }}>
@@ -427,12 +435,12 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                   {/* CO-PILOT */}
                   <TableCell sx={{ 
                     padding: 0, 
-                    borderRight: '1px solid #ccc'
+                    borderRight: '1px solid black'
                   }}>
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
+                        borderRight: '1px solid black',
                         borderBottom: 'none',
                         padding: '8px 4px'
                       }}>
@@ -490,10 +498,10 @@ const FlightHoursInput = ({ formData, handleChange }) => {
                     <TableRow sx={{ display: 'flex', height: '100%' }}>
                       <TableCell align="center" sx={{ 
                         flex: 1, 
-                        borderRight: '1px solid #ccc',
+                        borderRight: '1px solid black',
                         borderBottom: 'none',
                         padding: '8px 4px',
-                        backgroundColor: 'white' // Changed from blue to white
+                        backgroundColor: 'white'
                       }}>
                         <InputBase
                           name="instrument_flight"
