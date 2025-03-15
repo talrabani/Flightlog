@@ -29,6 +29,10 @@ const WrappingCell = styled(StyledTableCell)(({ theme }) => ({
   maxWidth: '150px'
 }));
 
+const WrappingCellThickRightBorder = styled(WrappingCell)(({ theme }) => ({
+  borderRight: '3px solid rgba(0, 0, 0, 0.5)'
+}));
+
 const HeaderCell = styled(StyledTableCell)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
   fontWeight: 'bold',
@@ -169,7 +173,7 @@ const LogbookTableClassic = ({ entries }) => {
           <TableRow>
             {/* Aircraft subcolumns */}
             <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>TYPE</HeaderCell>
-            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>REG.</HeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)', width: '80px' }}>REGISTRATION</HeaderCell>
             
             <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>PILOT IN <br /> COMMAND</HeaderCell>
             <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>OTHER PILOT OR <br />CREW</HeaderCell>
@@ -269,31 +273,31 @@ const LogbookTableClassic = ({ entries }) => {
               </WrappingCell>
               
               {/* Details with thick right border */}
-              <ThickRightBorderCell width="125px">{entry.remarks || '-'}</ThickRightBorderCell>
+              <WrappingCellThickRightBorder width="125px">{entry.details || '-'}</WrappingCellThickRightBorder>
               
               {/* Single-Engine */}
-              <DayCell>{entry.single_engine_icus_day || ''}</DayCell>
-              <NightCell>{entry.single_engine_icus_night || ''}</NightCell>
-              <DayCell>{entry.single_engine_dual_day || ''}</DayCell>
-              <NightCell>{entry.single_engine_dual_night || ''}</NightCell>
-              <DayCell>{entry.single_engine_command_day || ''}</DayCell>
-              <NightThickRightBorderCell>{entry.single_engine_command_night || ''}</NightThickRightBorderCell>
+              <DayCell>{entry.single_engine_icus_day}</DayCell>
+              <NightCell>{entry.single_engine_icus_night}</NightCell>
+              <DayCell>{entry.single_engine_dual_day}</DayCell>
+              <NightCell>{entry.single_engine_dual_night}</NightCell>
+              <DayCell>{entry.single_engine_command_day}</DayCell>
+              <NightThickRightBorderCell>{entry.single_engine_command_night}</NightThickRightBorderCell>
               
               {/* Multi-Engine */}
-              <DayCell>{entry.multi_engine_icus_day || ''}</DayCell>
-              <NightCell>{entry.multi_engine_icus_night || ''}</NightCell>
-              <DayCell>{entry.multi_engine_dual_day || ''}</DayCell>
-              <NightCell>{entry.multi_engine_dual_night || ''}</NightCell>
-              <DayCell>{entry.multi_engine_command_day || ''}</DayCell>
-              <NightThickRightBorderCell>{entry.multi_engine_command_night || ''}</NightThickRightBorderCell>
+              <DayCell>{entry.multi_engine_icus_day}</DayCell>
+              <NightCell>{entry.multi_engine_icus_night}</NightCell>
+              <DayCell>{entry.multi_engine_dual_day}</DayCell>
+              <NightCell>{entry.multi_engine_dual_night}</NightCell>
+              <DayCell>{entry.multi_engine_command_day}</DayCell>
+              <NightThickRightBorderCell>{entry.multi_engine_command_night}</NightThickRightBorderCell>
               
               {/* Co-Pilot */}
-              <DayCell>{entry.co_pilot_day || ''}</DayCell>
-              <NightThickRightBorderCell>{entry.co_pilot_night || ''}</NightThickRightBorderCell>
+              <DayCell>{entry.co_pilot_day}</DayCell>
+              <NightThickRightBorderCell>{entry.co_pilot_night}</NightThickRightBorderCell>
               
               {/* Instrument */}
-              <DayCell>{entry.instrument_flight || ''}</DayCell>
-              <SimCell>{entry.instrument_sim || ''}</SimCell>
+              <DayCell>{entry.instrument_flight}</DayCell>
+              <SimCell>{entry.instrument_sim}</SimCell>
             </TableRow>
           ))}
         </TableBody>

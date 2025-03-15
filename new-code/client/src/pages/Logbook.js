@@ -24,7 +24,7 @@ function Logbook() {
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
   const [processedEntries, setProcessedEntries] = useState([]);
-  const [viewMode, setViewMode] = useState('modern'); // 'modern' or 'classic'
+  const [viewMode, setViewMode] = useState('classic'); // 'modern' or 'classic'
   const [airportData, setAirportData] = useState({});
   const [loading, setLoading] = useState(true);
 
