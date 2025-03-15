@@ -6,10 +6,38 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  Checkbox
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const LogbookTableModern = ({ entries }) => {
+// Checkbox cell
+const CheckboxCell = styled(TableCell)(({ theme }) => ({
+  padding: '0 4px',
+  width: '40px'
+}));
+
+const LogbookTableModern = ({ 
+  entries,
+  selectionMode = false, 
+  selectedEntries = {}, 
+  onRowSelect = () => {}, 
+  onSelectAll = () => {} 
+}) => {
+  // Handle select all checkbox change
+  const handleSelectAllClick = (event) => {
+    onSelectAll(event.target.checked);
+  };
+
+  // Handle individual checkbox change
+  const handleCheckboxClick = (event, id) => {
+    onRowSelect(id, event.target.checked);
+  };
+
+  // Calculate if all entries are selected
+  const isAllSelected = entries.length > 0 && 
+    entries.every(entry => selectedEntries[entry.id]);
+
   const columns = [
     {
       field: 'flight_date',
@@ -143,6 +171,17 @@ const LogbookTableModern = ({ entries }) => {
       <Table sx={{ width: '100%' }} aria-label="flight logbook">
         <TableHead>
           <TableRow>
+            {selectionMode && (
+              <TableCell padding="checkbox">
+                <Checkbox
+                  indeterminate={Object.keys(selectedEntries).length > 0 && !isAllSelected}
+                  checked={isAllSelected}
+                  onChange={handleSelectAllClick}
+                  inputProps={{ 'aria-label': 'select all entries' }}
+                  size="small"
+                />
+              </TableCell>
+            )}
             {columns.map((column) => (
               <TableCell key={column.field}>{column.headerName}</TableCell>
             ))}
@@ -150,7 +189,20 @@ const LogbookTableModern = ({ entries }) => {
         </TableHead>
         <TableBody>
           {entries.map((entry) => (
-            <TableRow key={entry.id}>
+            <TableRow 
+              key={entry.id}
+              sx={selectedEntries[entry.id] ? { backgroundColor: 'rgba(0, 0, 0, 0.2)' } : {}}
+            >
+              {selectionMode && (
+                <CheckboxCell>
+                  <Checkbox
+                    checked={!!selectedEntries[entry.id]}
+                    onChange={(event) => handleCheckboxClick(event, entry.id)}
+                    inputProps={{ 'aria-labelledby': `entry-${entry.id}` }}
+                    size="small"
+                  />
+                </CheckboxCell>
+              )}
               {columns.map((column) => (
                 <TableCell key={column.field}>
                   {column.valueGetter 

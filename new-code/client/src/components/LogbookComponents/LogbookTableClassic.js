@@ -8,7 +8,8 @@ import {
   TableRow,
   Paper,
   Box,
-  Typography
+  Typography,
+  Checkbox
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -139,12 +140,51 @@ const BottomRowNightThickRightBorderHeaderCell = styled(VerticalNightThickRightB
   borderBottom: '3px solid rgba(0, 0, 0, 0.5)'
 }));
 
-const LogbookTableClassic = ({ entries }) => {
+// Checkbox cell
+const CheckboxCell = styled(StyledTableCell)(({ theme }) => ({
+  padding: '0 4px',
+  width: '40px'
+}));
+
+const LogbookTableClassic = ({ 
+  entries, 
+  selectionMode = false, 
+  selectedEntries = {}, 
+  onRowSelect = () => {}, 
+  onSelectAll = () => {} 
+}) => {
+  // Handle select all checkbox change
+  const handleSelectAllClick = (event) => {
+    onSelectAll(event.target.checked);
+  };
+
+  // Handle individual checkbox change
+  const handleCheckboxClick = (event, id) => {
+    onRowSelect(id, event.target.checked);
+  };
+
+  // Calculate if all entries are selected
+  const isAllSelected = entries.length > 0 && 
+    entries.every(entry => selectedEntries[entry.id]);
+
   return (
     <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
       <Table size="small" aria-label="classic flight logbook">
         <TableHead>
           <TableRow>
+            {/* Selection column */}
+            {selectionMode && (
+              <HeaderCell rowSpan={3} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)', width: '40px', padding: '0 4px' }}>
+                <Checkbox
+                  indeterminate={Object.keys(selectedEntries).length > 0 && !isAllSelected}
+                  checked={isAllSelected}
+                  onChange={handleSelectAllClick}
+                  inputProps={{ 'aria-label': 'select all entries' }}
+                  size="small"
+                />
+              </HeaderCell>
+            )}
+            
             {/* Date column */}
             <HeaderCell rowSpan={3} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>DATE</HeaderCell>
             
@@ -253,7 +293,22 @@ const LogbookTableClassic = ({ entries }) => {
         </TableHead>
         <TableBody>
           {entries.map((entry) => (
-            <TableRow key={entry.id}>
+            <TableRow 
+              key={entry.id}
+              sx={selectedEntries[entry.id] ? { backgroundColor: 'rgba(0, 0, 0, 0.05)' } : {}}
+            >
+              {/* Selection checkbox */}
+              {selectionMode && (
+                <CheckboxCell>
+                  <Checkbox
+                    checked={!!selectedEntries[entry.id]}
+                    onChange={(event) => handleCheckboxClick(event, entry.id)}
+                    inputProps={{ 'aria-labelledby': `entry-${entry.id}` }}
+                    size="small"
+                  />
+                </CheckboxCell>
+              )}
+              
               {/* Date */}
               <StyledTableCell>
                 {new Date(entry.flight_date).toLocaleDateString()}

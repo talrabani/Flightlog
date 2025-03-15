@@ -27,6 +27,36 @@ function Logbook() {
   const [viewMode, setViewMode] = useState('classic'); // 'modern' or 'classic'
   const [airportData, setAirportData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedEntries, setSelectedEntries] = useState({});
+
+  // Toggle selection mode
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    // Clear selections when exiting selection mode
+    if (selectionMode) {
+      setSelectedEntries({});
+    }
+  };
+
+  // Handle row selection
+  const handleRowSelect = (id, isSelected) => {
+    setSelectedEntries(prev => ({
+      ...prev,
+      [id]: isSelected
+    }));
+  };
+
+  // Handle select all
+  const handleSelectAll = (isSelected) => {
+    const newSelectedEntries = {};
+    if (isSelected) {
+      processedEntries.forEach(entry => {
+        newSelectedEntries[entry.id] = true;
+      });
+    }
+    setSelectedEntries(newSelectedEntries);
+  };
 
   // Fetch airport data for the given IDs
   const fetchAirportData = async (airportIds) => {
@@ -177,18 +207,10 @@ function Logbook() {
   return (
     <Container maxWidth={false} sx={{ px: 2 }}>
       <Box sx={{ my: 4, width: '100%' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ mb: 3 }}>
           <Typography variant="h4" gutterBottom>
             Flight Logbook
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/addlog')}
-          >
-            Add Entry
-          </Button>
         </Box>
         
         {/* View Toggle */}
@@ -211,14 +233,52 @@ function Logbook() {
           </ToggleButtonGroup>
         </Stack>
         
+        {/* Action Buttons */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/addlog')}
+          >
+            Add Entry
+          </Button>
+          <Button
+            variant={selectionMode ? "contained" : "outlined"}
+            color="primary"
+            onClick={toggleSelectionMode}
+          >
+            {selectionMode ? "Cancel Selection" : "Select"}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            disabled={!selectionMode || Object.keys(selectedEntries).length === 0}
+          >
+            Export
+          </Button>
+        </Box>
+        
         {/* Render the appropriate table based on the view mode */}
         {loading ? (
           <Typography>Loading logbook entries...</Typography>
         ) : (
           viewMode === 'modern' ? (
-            <LogbookTableModern entries={processedEntries} />
+            <LogbookTableModern 
+              entries={processedEntries} 
+              selectionMode={selectionMode}
+              selectedEntries={selectedEntries}
+              onRowSelect={handleRowSelect}
+              onSelectAll={handleSelectAll}
+            />
           ) : (
-            <LogbookTableClassic entries={processedEntries} />
+            <LogbookTableClassic 
+              entries={processedEntries} 
+              selectionMode={selectionMode}
+              selectedEntries={selectedEntries}
+              onRowSelect={handleRowSelect}
+              onSelectAll={handleSelectAll}
+            />
           )
         )}
       </Box>
