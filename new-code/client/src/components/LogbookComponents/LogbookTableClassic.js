@@ -120,6 +120,21 @@ const VerticalSimHeaderCell = styled(VerticalHeaderCell)(({ theme }) => ({
   backgroundColor: '#f0c8a8'
 }));
 
+// Bottom row header cells with thick bottom border
+const BottomRowHeaderCell = styled(VerticalHeaderCell)(({ theme }) => ({
+  borderBottom: '3px solid rgba(0, 0, 0, 0.5)'
+}));
+
+// Bottom row night header cells with thick bottom border
+const BottomRowNightHeaderCell = styled(VerticalNightHeaderCell)(({ theme }) => ({
+  borderBottom: '3px solid rgba(0, 0, 0, 0.5)'
+}));
+
+// Bottom row night header cells with thick right and bottom border
+const BottomRowNightThickRightBorderHeaderCell = styled(VerticalNightThickRightBorderHeaderCell)(({ theme }) => ({
+  borderBottom: '3px solid rgba(0, 0, 0, 0.5)'
+}));
+
 const LogbookTableClassic = ({ entries }) => {
   return (
     <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
@@ -127,7 +142,7 @@ const LogbookTableClassic = ({ entries }) => {
         <TableHead>
           <TableRow>
             {/* Date column */}
-            <HeaderCell rowSpan={3}>DATE</HeaderCell>
+            <HeaderCell rowSpan={3} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>DATE</HeaderCell>
             
             {/* Aircraft columns */}
             <GroupHeaderCell colSpan={2}>AIRCRAFT</GroupHeaderCell>
@@ -136,10 +151,10 @@ const LogbookTableClassic = ({ entries }) => {
             <GroupHeaderCell colSpan={2}>CREW</GroupHeaderCell>
             
             {/* Details group header */}
-            <GroupHeaderCell colSpan={2}>DETAILS</GroupHeaderCell>
+            <ThickRightBorderGroupHeaderCell colSpan={2}>DETAILS</ThickRightBorderGroupHeaderCell>
             
             {/* Single-Engine columns */}
-            <GroupHeaderCell colSpan={6}>SINGLE-ENGINE</GroupHeaderCell>
+            <ThickRightBorderGroupHeaderCell colSpan={6}>SINGLE-ENGINE</ThickRightBorderGroupHeaderCell>
             
             {/* Multi-Engine columns with thick right border */}
             <ThickRightBorderGroupHeaderCell colSpan={6}>MULTI-ENGINE</ThickRightBorderGroupHeaderCell>
@@ -153,20 +168,20 @@ const LogbookTableClassic = ({ entries }) => {
           
           <TableRow>
             {/* Aircraft subcolumns */}
-            <HeaderCell rowSpan={2}>TYPE</HeaderCell>
-            <HeaderCell rowSpan={2}>REG.</HeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>TYPE</HeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>REG.</HeaderCell>
             
-            <HeaderCell rowSpan={2}>PILOT IN <br /> COMMAND</HeaderCell>
-            <HeaderCell rowSpan={2}>OTHER PILOT OR <br />CREW</HeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>PILOT IN <br /> COMMAND</HeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>OTHER PILOT OR <br />CREW</HeaderCell>
             
             {/* Route and details */}
-            <HeaderCell rowSpan={2}>ROUTE</HeaderCell>
-            <ThickRightBorderHeaderCell rowSpan={2}>DETAILS</ThickRightBorderHeaderCell>
+            <HeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>ROUTE</HeaderCell>
+            <ThickRightBorderHeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>DETAILS</ThickRightBorderHeaderCell>
             
             {/* Single-Engine subcolumns */}
             <HeaderCell colSpan={2}>I.C.U.S.</HeaderCell>
             <HeaderCell colSpan={2}>DUAL</HeaderCell>
-            <HeaderCell colSpan={2}>COMMAND</HeaderCell>
+            <ThickRightBorderHeaderCell colSpan={2}>COMMAND</ThickRightBorderHeaderCell>
             
             {/* Multi-Engine subcolumns */}
             <HeaderCell colSpan={2}>I.C.U.S.</HeaderCell>
@@ -174,62 +189,62 @@ const LogbookTableClassic = ({ entries }) => {
             <ThickRightBorderHeaderCell colSpan={2}>COMMAND</ThickRightBorderHeaderCell>
             
             {/* Co-Pilot subcolumns */}
-            <VerticalHeaderCell rowSpan={2}>
+            <VerticalHeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>
               <Box>DAY</Box>
             </VerticalHeaderCell>
-            <VerticalNightThickRightBorderHeaderCell rowSpan={2}>
+            <VerticalNightThickRightBorderHeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>
               <Box>NIGHT</Box>
             </VerticalNightThickRightBorderHeaderCell>
             
             {/* Instrument subcolumns */}
-            <VerticalHeaderCell rowSpan={2}>
+            <VerticalHeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>
               <Box>IN FLIGHT</Box>
             </VerticalHeaderCell>
-            <VerticalSimHeaderCell rowSpan={2}>
+            <VerticalSimHeaderCell rowSpan={2} sx={{ borderBottom: '3px solid rgba(0, 0, 0, 0.5)' }}>
               <Box>IN SIM</Box>
             </VerticalSimHeaderCell>
           </TableRow>
           
-          <TableRow>
+          <TableRow sx={{ '& th': { borderBottom: '3px solid rgba(0, 0, 0, 0.5)' } }}>
             {/* Single-Engine Day/Night subcolumns */}
-            <VerticalHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightHeaderCell>
-            <VerticalHeaderCell>
+            </BottomRowNightHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightHeaderCell>
-            <VerticalHeaderCell>
+            </BottomRowNightHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightThickRightBorderHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightHeaderCell>
+            </BottomRowNightThickRightBorderHeaderCell>
             
             {/* Multi-Engine Day/Night subcolumns */}
-            <VerticalHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightHeaderCell>
-            <VerticalHeaderCell>
+            </BottomRowNightHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightHeaderCell>
-            <VerticalHeaderCell>
+            </BottomRowNightHeaderCell>
+            <BottomRowHeaderCell>
               <Box>DAY</Box>
-            </VerticalHeaderCell>
-            <VerticalNightThickRightBorderHeaderCell>
+            </BottomRowHeaderCell>
+            <BottomRowNightThickRightBorderHeaderCell>
               <Box>NIGHT</Box>
-            </VerticalNightThickRightBorderHeaderCell>
+            </BottomRowNightThickRightBorderHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -262,7 +277,7 @@ const LogbookTableClassic = ({ entries }) => {
               <DayCell>{entry.single_engine_dual_day || ''}</DayCell>
               <NightCell>{entry.single_engine_dual_night || ''}</NightCell>
               <DayCell>{entry.single_engine_command_day || ''}</DayCell>
-              <NightCell>{entry.single_engine_command_night || ''}</NightCell>
+              <NightThickRightBorderCell>{entry.single_engine_command_night || ''}</NightThickRightBorderCell>
               
               {/* Multi-Engine */}
               <DayCell>{entry.multi_engine_icus_day || ''}</DayCell>
