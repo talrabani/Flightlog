@@ -32,6 +32,7 @@ function Logbook() {
   const fetchAirportData = async (airportIds) => {
     try {
       const response = await axios.post(`${config.apiUrl}/api/airports/batch`, { ids: airportIds });
+      console.log("Batch airport data:", response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching airport data:', error);
@@ -42,6 +43,7 @@ function Logbook() {
   // Process the raw logbook data
   const processLogbookData = (data, airports) => {
     return data.map(entry => {
+      
       // Create a new object to avoid mutating the original
       const processedEntry = { ...entry };
 
@@ -89,10 +91,10 @@ function Logbook() {
       processedEntry.multi_engine_command_night = 0;
 
       // Determine if aircraft is single or multi-engine based on aircraft_class
-      const isMultiEngine = processedEntry.aircraft_class && 
-                           (processedEntry.aircraft_class.toLowerCase().includes('multi') || 
-                            processedEntry.aircraft_class === 'ME' || 
-                            processedEntry.aircraft_class === 'M');
+      const isMultiEngine = processedEntry.aircraft_class === 'M';
+      const isSingleEngine = processedEntry.aircraft_class === 'S';
+
+      console.log(`Aircraft ${processedEntry.aircraft_reg} class: ${processedEntry.aircraft_class}, isMultiEngine: ${isMultiEngine}, isSingleEngine: ${isSingleEngine}`);
 
       // Helper function to convert string hours to numbers
       const parseHours = (value) => {
@@ -102,15 +104,7 @@ function Logbook() {
       };
 
       // Allocate hours based on determined engine type
-      if (!isMultiEngine) {
-        // Single engine (default if not explicitly multi-engine)
-        processedEntry.single_engine_icus_day = parseHours(processedEntry.icus_day);
-        processedEntry.single_engine_icus_night = parseHours(processedEntry.icus_night);
-        processedEntry.single_engine_dual_day = parseHours(processedEntry.dual_day);
-        processedEntry.single_engine_dual_night = parseHours(processedEntry.dual_night);
-        processedEntry.single_engine_command_day = parseHours(processedEntry.command_day);
-        processedEntry.single_engine_command_night = parseHours(processedEntry.command_night);
-      } else {
+      if (isMultiEngine) {
         // Multi engine
         processedEntry.multi_engine_icus_day = parseHours(processedEntry.icus_day);
         processedEntry.multi_engine_icus_night = parseHours(processedEntry.icus_night);
@@ -118,6 +112,14 @@ function Logbook() {
         processedEntry.multi_engine_dual_night = parseHours(processedEntry.dual_night);
         processedEntry.multi_engine_command_day = parseHours(processedEntry.command_day);
         processedEntry.multi_engine_command_night = parseHours(processedEntry.command_night);
+      } else {
+        // Single engine (default if not explicitly multi-engine)
+        processedEntry.single_engine_icus_day = parseHours(processedEntry.icus_day);
+        processedEntry.single_engine_icus_night = parseHours(processedEntry.icus_night);
+        processedEntry.single_engine_dual_day = parseHours(processedEntry.dual_day);
+        processedEntry.single_engine_dual_night = parseHours(processedEntry.dual_night);
+        processedEntry.single_engine_command_day = parseHours(processedEntry.command_day);
+        processedEntry.single_engine_command_night = parseHours(processedEntry.command_night);
       }
 
       return processedEntry;

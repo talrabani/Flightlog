@@ -21,13 +21,13 @@ const FlightHoursInput = ({ formData, handleChange }) => {
   useEffect(() => {
     if (!formData.aircraft_reg) {
       setDisplayEngineType('SELECT AN AIRCRAFT FOR ENGINE TYPE');
-    } else if (formData.engine_type) {
+    } else if (formData.aircraft_class === 'S') {
       // Convert to uppercase for display
-      setDisplayEngineType(formData.engine_type.toUpperCase());
-    } else {
       setDisplayEngineType('SINGLE-ENGINE');
+    } else {
+      setDisplayEngineType('MULTI-ENGINE');
     }
-  }, [formData.aircraft_reg, formData.engine_type]);
+  }, [formData.aircraft_reg, formData.aircraft_class]);
 
   // Custom handler for direct input fields
   const handleDirectInputChange = (e) => {
