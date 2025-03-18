@@ -21,6 +21,15 @@ import {
   RouteSelector
 } from '../components/AddLogComponents';
 
+// Import helper function to invalidate cache
+const invalidateLogbookCache = (userId = 1) => {
+  localStorage.removeItem(`logbook_entries_${userId}`);
+  localStorage.removeItem(`processed_entries_${userId}`);
+  localStorage.removeItem(`airport_data_${userId}`);
+  localStorage.removeItem(`logbook_cache_timestamp_${userId}`);
+  console.log('Logbook cache invalidated');
+};
+
 function AddLog() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -236,6 +245,9 @@ function AddLog() {
         await axios.post(`${config.apiUrl}/api/logbook`, processedData);
         console.log('New log entry created successfully');
       }
+      
+      // Invalidate the cache to ensure fresh data is loaded in the logbook
+      invalidateLogbookCache();
       
       navigate('/logbook');
     } catch (err) {

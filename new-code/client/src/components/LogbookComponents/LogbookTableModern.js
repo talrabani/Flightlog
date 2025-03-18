@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, memo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -25,6 +25,63 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }));
 
+// Memoized table row component to prevent unnecessary re-renders
+const MemoizedTableRow = memo(({ 
+  entry, 
+  columns, 
+  isSelected, 
+  selectionMode, 
+  onRowDoubleClick, 
+  onCheckboxClick 
+}) => {
+  // Optimize the double-click handler with useCallback
+  const handleDoubleClick = useCallback(() => {
+    onRowDoubleClick(entry);
+  }, [entry, onRowDoubleClick]);
+  
+  // Optimize the checkbox click handler with useCallback
+  const handleCheckbox = useCallback((event) => {
+    onCheckboxClick(event, entry.id);
+  }, [entry.id, onCheckboxClick]);
+  
+  // Handle row click with double-click detection
+  const handleRowClick = useCallback((e) => {
+    if (e.detail === 2) {
+      handleDoubleClick();
+    }
+  }, [handleDoubleClick]);
+  
+  return (
+    <StyledTableRow 
+      onClick={handleRowClick}
+      sx={isSelected ? { backgroundColor: 'rgba(0, 0, 0, 0.2)' } : {}}
+    >
+      {selectionMode && (
+        <CheckboxCell>
+          <Checkbox
+            checked={isSelected}
+            onChange={handleCheckbox}
+            inputProps={{ 'aria-labelledby': `entry-${entry.id}` }}
+            size="small"
+          />
+        </CheckboxCell>
+      )}
+      {columns.map((column) => (
+        <TableCell key={column.field}>
+          {column.valueGetter 
+            ? column.valueGetter({ row: entry }) 
+            : column.valueFormatter 
+              ? column.valueFormatter({ value: entry[column.field] }) 
+              : entry[column.field]}
+        </TableCell>
+      ))}
+    </StyledTableRow>
+  );
+});
+
+// Set display name for debugging
+MemoizedTableRow.displayName = 'MemoizedTableRow';
+
 const LogbookTableModern = ({ 
   entries,
   selectionMode = false, 
@@ -34,26 +91,23 @@ const LogbookTableModern = ({
   onRowDoubleClick = () => {} 
 }) => {
   // Handle select all checkbox change
-  const handleSelectAllClick = (event) => {
+  const handleSelectAllClick = useCallback((event) => {
     onSelectAll(event.target.checked);
-  };
+  }, [onSelectAll]);
 
   // Handle individual checkbox change
-  const handleCheckboxClick = (event, id) => {
+  const handleCheckboxClick = useCallback((event, id) => {
     event.stopPropagation(); // Prevent row click event
     onRowSelect(id, event.target.checked);
-  };
+  }, [onRowSelect]);
 
-  // Handle double click on a row
-  const handleRowDoubleClick = (entry) => {
-    onRowDoubleClick(entry);
-  };
+  // Calculate if all entries are selected - memoized
+  const isAllSelected = useMemo(() => {
+    return entries.length > 0 && entries.every(entry => selectedEntries[entry.id]);
+  }, [entries, selectedEntries]);
 
-  // Calculate if all entries are selected
-  const isAllSelected = entries.length > 0 && 
-    entries.every(entry => selectedEntries[entry.id]);
-
-  const columns = [
+  // Memoize the columns definition to prevent re-creation on every render
+  const columns = useMemo(() => [
     {
       field: 'flight_date',
       headerName: 'Date',
@@ -179,56 +233,45 @@ const LogbookTableModern = ({
         return instrumentTime.toFixed(1);
       }
     },
-  ];
+  ], []);
+
+  // Memoize the table header to prevent re-rendering when only data changes
+  const tableHeader = useMemo(() => (
+    <TableHead>
+      <TableRow>
+        {selectionMode && (
+          <TableCell padding="checkbox">
+            <Checkbox
+              indeterminate={Object.keys(selectedEntries).length > 0 && !isAllSelected}
+              checked={isAllSelected}
+              onChange={handleSelectAllClick}
+              inputProps={{ 'aria-label': 'select all entries' }}
+              size="small"
+            />
+          </TableCell>
+        )}
+        {columns.map((column) => (
+          <TableCell key={column.field}>{column.headerName}</TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  ), [columns, handleSelectAllClick, isAllSelected, selectedEntries, selectionMode]);
 
   return (
     <TableContainer component={Paper} sx={{ width: '100%' }}>
       <Table sx={{ width: '100%' }} aria-label="flight logbook">
-        <TableHead>
-          <TableRow>
-            {selectionMode && (
-              <TableCell padding="checkbox">
-                <Checkbox
-                  indeterminate={Object.keys(selectedEntries).length > 0 && !isAllSelected}
-                  checked={isAllSelected}
-                  onChange={handleSelectAllClick}
-                  inputProps={{ 'aria-label': 'select all entries' }}
-                  size="small"
-                />
-              </TableCell>
-            )}
-            {columns.map((column) => (
-              <TableCell key={column.field}>{column.headerName}</TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
+        {tableHeader}
         <TableBody>
           {entries.map((entry) => (
-            <StyledTableRow 
+            <MemoizedTableRow
               key={entry.id}
-              onClick={(e) => e.detail === 2 && handleRowDoubleClick(entry)}
-              sx={selectedEntries[entry.id] ? { backgroundColor: 'rgba(0, 0, 0, 0.2)' } : {}}
-            >
-              {selectionMode && (
-                <CheckboxCell>
-                  <Checkbox
-                    checked={!!selectedEntries[entry.id]}
-                    onChange={(event) => handleCheckboxClick(event, entry.id)}
-                    inputProps={{ 'aria-labelledby': `entry-${entry.id}` }}
-                    size="small"
-                  />
-                </CheckboxCell>
-              )}
-              {columns.map((column) => (
-                <TableCell key={column.field}>
-                  {column.valueGetter 
-                    ? column.valueGetter({ row: entry }) 
-                    : column.valueFormatter 
-                      ? column.valueFormatter({ value: entry[column.field] }) 
-                      : entry[column.field]}
-                </TableCell>
-              ))}
-            </StyledTableRow>
+              entry={entry}
+              columns={columns}
+              isSelected={!!selectedEntries[entry.id]}
+              selectionMode={selectionMode}
+              onRowDoubleClick={onRowDoubleClick}
+              onCheckboxClick={handleCheckboxClick}
+            />
           ))}
         </TableBody>
       </Table>
@@ -236,4 +279,5 @@ const LogbookTableModern = ({
   );
 };
 
-export default LogbookTableModern;
+// Export the component wrapped in memo for additional optimization
+export default memo(LogbookTableModern);
