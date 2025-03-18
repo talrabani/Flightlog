@@ -17,12 +17,21 @@ const CheckboxCell = styled(TableCell)(({ theme }) => ({
   width: '40px'
 }));
 
+// Styled row with hover effect
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.07)',
+    cursor: 'pointer'
+  }
+}));
+
 const LogbookTableModern = ({ 
   entries,
   selectionMode = false, 
   selectedEntries = {}, 
   onRowSelect = () => {}, 
-  onSelectAll = () => {} 
+  onSelectAll = () => {},
+  onRowDoubleClick = () => {} 
 }) => {
   // Handle select all checkbox change
   const handleSelectAllClick = (event) => {
@@ -31,7 +40,13 @@ const LogbookTableModern = ({
 
   // Handle individual checkbox change
   const handleCheckboxClick = (event, id) => {
+    event.stopPropagation(); // Prevent row click event
     onRowSelect(id, event.target.checked);
+  };
+
+  // Handle double click on a row
+  const handleRowDoubleClick = (entry) => {
+    onRowDoubleClick(entry);
   };
 
   // Calculate if all entries are selected
@@ -189,8 +204,9 @@ const LogbookTableModern = ({
         </TableHead>
         <TableBody>
           {entries.map((entry) => (
-            <TableRow 
+            <StyledTableRow 
               key={entry.id}
+              onClick={(e) => e.detail === 2 && handleRowDoubleClick(entry)}
               sx={selectedEntries[entry.id] ? { backgroundColor: 'rgba(0, 0, 0, 0.2)' } : {}}
             >
               {selectionMode && (
@@ -212,7 +228,7 @@ const LogbookTableModern = ({
                       : entry[column.field]}
                 </TableCell>
               ))}
-            </TableRow>
+            </StyledTableRow>
           ))}
         </TableBody>
       </Table>

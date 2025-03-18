@@ -57,6 +57,47 @@ function Logbook() {
     }
     setSelectedEntries(newSelectedEntries);
   };
+  
+  // Handle row double-click for editing
+  const handleRowDoubleClick = (entry) => {
+    console.log('Double-clicked entry:', entry);
+    
+    // Prepare the entry data for editing
+    const editData = {
+      id: entry.id,
+      flight_date: entry.flight_date,
+      aircraft_reg: entry.aircraft_reg,
+      aircraft_model: entry.aircraft_model,
+      aircraft_manufacturer: entry.aircraft_manufacturer,
+      aircraft_designator: entry.aircraft_designator,
+      aircraft_wtc: entry.aircraft_wtc,
+      aircraft_category: entry.aircraft_category,
+      aircraft_class: entry.aircraft_class,
+      aircraft_id: entry.aircraft_id,
+      
+      pilot_in_command: entry.pilot_in_command,
+      other_crew: entry.other_crew,
+      route_data: entry.route_data,
+      details: entry.details,
+      flight_type: entry.flight_type,
+      flight_rule: entry.flight_rule,
+      
+      // Flight hours
+      icus_day: entry.icus_day,
+      icus_night: entry.icus_night,
+      dual_day: entry.dual_day,
+      dual_night: entry.dual_night,
+      command_day: entry.command_day,
+      command_night: entry.command_night,
+      co_pilot_day: entry.co_pilot_day,
+      co_pilot_night: entry.co_pilot_night,
+      instrument_flight: entry.instrument_flight,
+      instrument_sim: entry.instrument_sim
+    };
+    
+    // Navigate to AddLog with state containing the entry data
+    navigate('/addlog', { state: { editData } });
+  };
 
   // Fetch airport data for the given IDs
   const fetchAirportData = async (airportIds) => {
@@ -270,6 +311,7 @@ function Logbook() {
               selectedEntries={selectedEntries}
               onRowSelect={handleRowSelect}
               onSelectAll={handleSelectAll}
+              onRowDoubleClick={handleRowDoubleClick}
             />
           ) : (
             <LogbookTableClassic 
@@ -278,6 +320,7 @@ function Logbook() {
               selectedEntries={selectedEntries}
               onRowSelect={handleRowSelect}
               onSelectAll={handleSelectAll}
+              onRowDoubleClick={handleRowDoubleClick}
             />
           )
         )}

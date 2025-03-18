@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   TextField,
@@ -7,6 +7,7 @@ import {
   Box,
   Autocomplete,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +17,61 @@ import config from '../../config';
 
 const RouteSelector = ({ formData, setFormData }) => {
   const [airportOptions, setAirportOptions] = useState([]);
+  const [loadingAirports, setLoadingAirports] = useState({});
+
+  // Fetch airport details when the route data is loaded from an existing entry
+  useEffect(() => {
+    const fetchExistingAirports = async () => {
+      // Check if we have route data with airport IDs but no airport data (common when editing)
+      const routeStopsNeedingData = formData.route_data.filter(
+        stop => stop.airport_id && !stop.airport_data && !stop.is_custom
+      );
+      
+      if (routeStopsNeedingData.length === 0) return;
+      
+      // Get unique airport IDs to fetch
+      const airportIds = [...new Set(routeStopsNeedingData.map(stop => stop.airport_id))];
+      console.log('Fetching details for airports:', airportIds);
+      
+      try {
+        const airportDetailsMap = {};
+        
+        // Fetch details for each airport individually since we don't know if batch endpoint is available
+        for (const airportId of airportIds) {
+          setLoadingAirports(prev => ({ ...prev, [airportId]: true }));
+          
+          try {
+            const response = await axios.get(`${config.apiUrl}/api/airports/${airportId}`);
+            airportDetailsMap[airportId] = response.data;
+          } catch (err) {
+            console.error(`Error fetching airport ${airportId}:`, err);
+          } finally {
+            setLoadingAirports(prev => ({ ...prev, [airportId]: false }));
+          }
+        }
+        
+        // Update route data with fetched airport details
+        if (Object.keys(airportDetailsMap).length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            route_data: prev.route_data.map(stop => {
+              if (stop.airport_id && !stop.airport_data && airportDetailsMap[stop.airport_id]) {
+                return {
+                  ...stop,
+                  airport_data: airportDetailsMap[stop.airport_id]
+                };
+              }
+              return stop;
+            })
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching airport details:', error);
+      }
+    };
+    
+    fetchExistingAirports();
+  }, [formData.route_data, setFormData]);
 
   const searchAirports = async (searchText) => {
     try {
@@ -78,7 +134,7 @@ const RouteSelector = ({ formData, setFormData }) => {
           <Autocomplete
             options={airportOptions}
             getOptionLabel={(option) => 
-              option ? `${option.icao} - ${option.airport_name}` : ''
+              option ? `${option.icao || ''} - ${option.airport_name || ''}` : ''
             }
             value={stop.airport_data || null}
             onChange={(_, newValue) => handleRouteChange(index, newValue)}
@@ -90,7 +146,7 @@ const RouteSelector = ({ formData, setFormData }) => {
             renderOption={(props, option) => (
               <li {...props}>
                 <Typography component="span">
-                  <strong>{option.icao}</strong> - {option.airport_name}
+                  <strong>{option.icao || option.iata || ''}</strong> - {option.airport_name || ''}
                 </Typography>
               </li>
             )}
@@ -105,6 +161,15 @@ const RouteSelector = ({ formData, setFormData }) => {
                 }
                 required
                 fullWidth
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingAirports[stop.airport_id] ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
               />
             )}
             sx={{ flex: 1 }}

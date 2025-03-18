@@ -673,5 +673,95 @@ app.get('/api/user-aircraft/:userId/registration/:registration', async (req, res
   }
 });
 
+// Update a logbook entry
+app.put('/api/logbook/:entryId', async (req, res) => {
+  try {
+    const { entryId } = req.params;
+    const {
+      userId,
+      flight_date,
+      aircraft_reg,
+      pilot_in_command,
+      other_crew,
+      route_data,
+      details,
+      flight_type,
+      flight_rule,
+      icus_day,
+      icus_night,
+      dual_day,
+      dual_night,
+      command_day,
+      command_night,
+      co_pilot_day,
+      co_pilot_night,
+      instrument_flight,
+      instrument_sim
+    } = req.body;
+
+    console.log(`Updating logbook entry ${entryId} for user ${userId}`);
+    
+    const query = `
+      UPDATE logbook_entries
+      SET 
+        flight_date = $1,
+        aircraft_reg = $2,
+        pilot_in_command = $3,
+        other_crew = $4,
+        route_data = $5,
+        details = $6,
+        flight_type = $7,
+        flight_rule = $8,
+        icus_day = $9,
+        icus_night = $10,
+        dual_day = $11,
+        dual_night = $12,
+        command_day = $13,
+        command_night = $14,
+        co_pilot_day = $15,
+        co_pilot_night = $16,
+        instrument_flight = $17,
+        instrument_sim = $18
+      WHERE id = $19 AND user_id = $20
+      RETURNING *;
+    `;
+
+    const values = [
+      flight_date,
+      aircraft_reg,
+      pilot_in_command,
+      other_crew || null,
+      JSON.stringify(route_data),
+      details || null,
+      flight_type || null,
+      flight_rule || null,
+      icus_day || 0,
+      icus_night || 0,
+      dual_day || 0,
+      dual_night || 0,
+      command_day || 0,
+      command_night || 0,
+      co_pilot_day || 0,
+      co_pilot_night || 0,
+      instrument_flight || 0,
+      instrument_sim || 0,
+      entryId,
+      userId
+    ];
+
+    const result = await pool.query(query, values);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Logbook entry not found or not updated" });
+    }
+    
+    console.log('Logbook entry updated successfully:', result.rows[0]);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating logbook entry:", err);
+    res.status(500).json({ error: "Server Error", details: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

@@ -146,12 +146,21 @@ const CheckboxCell = styled(StyledTableCell)(({ theme }) => ({
   width: '40px'
 }));
 
+// Add hover effect and double-click functionality to rows
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.07)',
+    cursor: 'pointer'
+  }
+}));
+
 const LogbookTableClassic = ({ 
   entries, 
   selectionMode = false, 
   selectedEntries = {}, 
   onRowSelect = () => {}, 
-  onSelectAll = () => {} 
+  onSelectAll = () => {},
+  onRowDoubleClick = () => {}
 }) => {
   // Handle select all checkbox change
   const handleSelectAllClick = (event) => {
@@ -160,7 +169,13 @@ const LogbookTableClassic = ({
 
   // Handle individual checkbox change
   const handleCheckboxClick = (event, id) => {
+    event.stopPropagation(); // Prevent row click event
     onRowSelect(id, event.target.checked);
+  };
+  
+  // Handle double click on a row
+  const handleRowDoubleClick = (entry) => {
+    onRowDoubleClick(entry);
   };
 
   // Calculate if all entries are selected
@@ -293,9 +308,10 @@ const LogbookTableClassic = ({
         </TableHead>
         <TableBody>
           {entries.map((entry) => (
-            <TableRow 
+            <StyledTableRow 
               key={entry.id}
               sx={selectedEntries[entry.id] ? { backgroundColor: 'rgba(0, 0, 0, 0.05)' } : {}}
+              onClick={(e) => e.detail === 2 && handleRowDoubleClick(entry)}
             >
               {/* Selection checkbox */}
               {selectionMode && (
@@ -353,7 +369,7 @@ const LogbookTableClassic = ({
               {/* Instrument */}
               <DayCell>{entry.instrument_flight}</DayCell>
               <SimCell>{entry.instrument_sim}</SimCell>
-            </TableRow>
+            </StyledTableRow>
           ))}
         </TableBody>
       </Table>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import {
   Container,
@@ -23,6 +23,8 @@ import {
 
 function AddLog() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     flight_date: '',
@@ -53,6 +55,65 @@ function AddLog() {
     instrument_flight: '0',
     instrument_sim: '0'
   });
+
+  // Check if we're in edit mode with pre-filled data
+  useEffect(() => {
+    if (location.state?.editData) {
+      const editData = location.state.editData;
+      console.log('Editing existing log entry:', editData);
+      setIsEditMode(true);
+      
+      // Format and prepare the data before setting it
+      const preparedEditData = {
+        ...editData,
+        // Ensure date is in the proper format YYYY-MM-DD for the date input
+        flight_date: editData.flight_date ? editData.flight_date.substring(0, 10) : '',
+        // Ensure route_data is properly structured
+        route_data: Array.isArray(editData.route_data) ? editData.route_data : 
+          // If it's a string (from JSON), parse it
+          (typeof editData.route_data === 'string' ? 
+            JSON.parse(editData.route_data) : 
+            // Default empty route if nothing is available
+            [
+              { type: 'departure', airport_id: null, airport_data: null, is_custom: false, custom_name: null },
+              { type: 'arrival', airport_id: null, airport_data: null, is_custom: false, custom_name: null }
+            ]
+          )
+      };
+      
+      console.log('Prepared edit data:', preparedEditData);
+      
+      // Fetch more details about the aircraft to get original_aircraft_data
+      const fetchAircraftDetails = async () => {
+        try {
+          if (editData.aircraft_reg) {
+            const response = await axios.get(
+              `${config.apiUrl}/api/user-aircraft/1/registration/${editData.aircraft_reg}`
+            );
+            
+            if (response.data.found) {
+              const aircraftDetails = response.data.aircraft;
+              
+              // Set form data with all the edit data and the original aircraft data
+              setFormData({
+                ...preparedEditData,
+                original_aircraft_data: aircraftDetails
+              });
+            } else {
+              // If aircraft not found (unusual case), just populate with edit data
+              setFormData(preparedEditData);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching aircraft details:', error);
+          // Still set the form data even if the aircraft lookup fails
+          setFormData(preparedEditData);
+        }
+      };
+      
+      fetchAircraftDetails();
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -166,10 +227,19 @@ function AddLog() {
       
       console.log('Processed data for submission:', processedData);
 
-      await axios.post(`${config.apiUrl}/api/logbook`, processedData);
+      // If in edit mode, update the existing log entry
+      if (isEditMode && formData.id) {
+        await axios.put(`${config.apiUrl}/api/logbook/${formData.id}`, processedData);
+        console.log('Log entry updated successfully');
+      } else {
+        // Otherwise create a new log entry
+        await axios.post(`${config.apiUrl}/api/logbook`, processedData);
+        console.log('New log entry created successfully');
+      }
+      
       navigate('/logbook');
     } catch (err) {
-      setError('Error adding logbook entry. Please try again.');
+      setError(`Error ${isEditMode ? 'updating' : 'adding'} logbook entry. Please try again.`);
       console.error('Error:', err);
     }
   };
@@ -195,7 +265,7 @@ function AddLog() {
           mb: 2
         }}>
           <FlightIcon fontSize="medium" color="primary" />
-          Add Log
+          {isEditMode ? 'Edit Log Entry' : 'Add Log'}
         </Typography>
         <Paper sx={{ 
           p: 2,
