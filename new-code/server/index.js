@@ -582,11 +582,10 @@ app.post('/api/user-aircraft', async (req, res) => {
 });
 
 // Update a custom aircraft
-app.put('/api/user-aircraft/:id', async (req, res) => {
+app.put('/api/user-aircraft/:userId/:aircraftReg', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { userId, aircraftReg } = req.params;
     const { 
-      aircraft_reg,
       aircraft_designator,
       aircraft_manufacturer,
       aircraft_model,
@@ -595,40 +594,46 @@ app.put('/api/user-aircraft/:id', async (req, res) => {
       aircraft_class
     } = req.body;
 
+    console.log(`Updating aircraft ${aircraftReg} for user ${userId}`);
+    console.log('Update data:', req.body);
+
     const query = `
       UPDATE user_aircraft
       SET 
-        aircraft_reg = $1,
-        aircraft_designator = $2,
-        aircraft_manufacturer = $3,
-        aircraft_model = $4,
-        aircraft_wtc = $5,
-        aircraft_category = $6,
-        aircraft_class = $7
-      WHERE id = $8
+        aircraft_designator = $1,
+        aircraft_manufacturer = $2,
+        aircraft_model = $3,
+        aircraft_wtc = $4,
+        aircraft_category = $5,
+        aircraft_class = $6
+      WHERE user_id = $7 AND aircraft_reg = $8
       RETURNING *;
     `;
 
     const values = [
-      aircraft_reg,
       aircraft_designator,
       aircraft_manufacturer,
       aircraft_model,
       aircraft_wtc,
       aircraft_category,
       aircraft_class,
-      id
+      userId,
+      aircraftReg
     ];
 
     const result = await pool.query(query, values);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Aircraft not found or not updated" });
+    }
+    
+    console.log('Aircraft updated successfully:', result.rows[0]);
     res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error("Error updating custom aircraft:", err);
-    res.status(500).json({ error: "Server Error" });
+    res.status(500).json({ error: "Server Error", details: err.message });
   }
 });
-
-
 
 // Get user's aircraft
 app.get('/api/user-aircraft/:userId', async (req, res) => {

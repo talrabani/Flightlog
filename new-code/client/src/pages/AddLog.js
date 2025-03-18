@@ -68,6 +68,76 @@ function AddLog() {
     setError('');
 
     try {
+      // Helper function to check if aircraft has been modified
+      const isAircraftModified = (current, original) => {
+        if (!original) return false; // If no original, it's a new aircraft, not a modified one
+        
+        // Compare fields that might have been modified
+        return String(current.aircraft_model) !== String(original.aircraft_model) ||
+               String(current.aircraft_manufacturer) !== String(original.aircraft_manufacturer) ||
+               String(current.aircraft_designator) !== String(original.aircraft_designator) ||
+               String(current.aircraft_wtc) !== String(original.aircraft_wtc) ||
+               String(current.aircraft_category) !== String(original.aircraft_category) ||
+               String(current.aircraft_class) !== String(original.aircraft_class);
+      };
+
+      console.log('Form data before submission:', formData);
+      console.log('Is new aircraft?', formData.is_new_aircraft);
+      console.log('Original aircraft data:', formData.original_aircraft_data);
+      
+      const isNewAircraft = formData.is_new_aircraft === true;
+      const hasBeenModified = isAircraftModified(formData, formData.original_aircraft_data);
+      
+      console.log('Aircraft has been modified?', hasBeenModified);
+      
+      // Handle aircraft database operations
+      if (isNewAircraft) {
+        // Create new aircraft record
+        console.log('Creating new aircraft:', formData.aircraft_reg);
+        try {
+          const response = await axios.post(`${config.apiUrl}/api/user-aircraft`, {
+            userId: 1, // TODO: Replace with actual user ID from auth system
+            aircraft_reg: formData.aircraft_reg,
+            aircraft_designator: formData.aircraft_designator,
+            aircraft_manufacturer: formData.aircraft_manufacturer,
+            aircraft_model: formData.aircraft_model,
+            aircraft_wtc: formData.aircraft_wtc,
+            aircraft_category: formData.aircraft_category,
+            aircraft_class: formData.aircraft_class
+          });
+          console.log('New aircraft created successfully:', response.data);
+          
+          // Update formData with the created aircraft ID
+          formData.aircraft_id = response.data.id || response.data.aircraft_id || response.data.user_aircraft_id;
+        } catch (aircraftError) {
+          console.error('Error creating aircraft:', aircraftError);
+          setError('Error creating aircraft. Please check the aircraft details and try again.');
+          return; // Stop the form submission if aircraft creation fails
+        }
+      } else if (hasBeenModified) {
+        // Update existing aircraft
+        console.log('Updating existing aircraft:', formData.aircraft_reg);
+        try {
+          const response = await axios.put(`${config.apiUrl}/api/user-aircraft/${1}/${formData.aircraft_reg}`, {
+            userId: 1, // TODO: Replace with actual user ID from auth system
+            aircraft_designator: formData.aircraft_designator,
+            aircraft_manufacturer: formData.aircraft_manufacturer,
+            aircraft_model: formData.aircraft_model,
+            aircraft_wtc: formData.aircraft_wtc,
+            aircraft_category: formData.aircraft_category,
+            aircraft_class: formData.aircraft_class
+          });
+          console.log('Aircraft updated successfully:', response.data);
+        } catch (updateError) {
+          console.error('Error updating aircraft:', updateError);
+          setError('Error updating aircraft. Your log will still be saved, but the aircraft details may not be updated.');
+          // Continue with form submission - don't return
+        }
+      } else {
+        console.log('Using existing aircraft without modifications');
+      }
+
+      // Continue with log submission
       const numericFields = [
         'icus_day', 'icus_night', 'dual_day', 'dual_night',
         'command_day', 'command_night', 'co_pilot_day', 'co_pilot_night',
@@ -86,12 +156,15 @@ function AddLog() {
         }))
       };
 
+      // Remove fields that shouldn't be sent to the server
+      delete processedData.original_aircraft_data;
+      delete processedData.is_new_aircraft;
+
       numericFields.forEach(field => {
         processedData[field] = parseFloat(formData[field]) || 0;
       });
       
-      console.log('Form data:', formData);
-      console.log('Processed data:', processedData);
+      console.log('Processed data for submission:', processedData);
 
       await axios.post(`${config.apiUrl}/api/logbook`, processedData);
       navigate('/logbook');

@@ -54,10 +54,11 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
         aircraft_manufacturer: '',
         aircraft_designator: '',
         aircraft_wtc: '',
-        aircraft_category: 'A',
-        aircraft_class: 'S',
+        aircraft_category: 'A', // Default to Airplane
+        aircraft_class: 'S', // Default to Single-Engine
         aircraft_id: null,
-        is_new_aircraft: false
+        is_new_aircraft: false,
+        original_aircraft_data: null // Clear original data
       }));
     }
     
@@ -147,7 +148,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
         setAircraftFound(false);
       }
     } else {
-      // For other fields, just update normally
+      // For other fields, just update normally without setting flags
       setFormData(prev => ({
         ...prev,
         [name]: value
@@ -190,7 +191,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
       aircraft_model: selectedType.model || '',
       aircraft_manufacturer: selectedType.manufacturer || '',
       aircraft_designator: selectedType.designator || '',
-      aircraft_wtc: selectedType.wtc || '',
+      aircraft_wtc: selectedType.wtc || ''
     }));
   };
 
@@ -210,8 +211,10 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
       if (response.data.found) {
         setAircraftFound(true);
         const aircraft = response.data.aircraft;
-        // Store the complete aircraft object
+        
+        // Store the original aircraft data for comparison during form submission
         setOriginalAircraftData(aircraft);
+        console.log('Found existing aircraft:', aircraft);
         
         // Determine the ID field based on what's available
         const aircraft_id = aircraft.aircraft_id || aircraft.user_aircraft_id || aircraft.id;
@@ -225,7 +228,8 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
           aircraft_wtc: aircraft.aircraft_wtc,
           aircraft_category: aircraft.aircraft_category,
           aircraft_class: aircraft.aircraft_class,
-          is_new_aircraft: false // This is an existing aircraft
+          is_new_aircraft: false, // This is an existing aircraft
+          original_aircraft_data: aircraft // Store original data in form state for comparison on submit
         }));
       } else {
         setAircraftFound(false);
@@ -240,7 +244,8 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
           aircraft_wtc: '',
           aircraft_category: 'A',
           aircraft_class: 'S',
-          is_new_aircraft: true // This will be a new aircraft when the form is submitted
+          is_new_aircraft: true, // This will be a new aircraft when the form is submitted
+          original_aircraft_data: null
         }));
       }
     } catch (error) {
@@ -257,7 +262,8 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
         aircraft_wtc: '',
         aircraft_category: 'A',
         aircraft_class: 'S',
-        is_new_aircraft: true
+        is_new_aircraft: true,
+        original_aircraft_data: null
       }));
     } finally {
       setSearchingAircraft(false);
@@ -589,10 +595,10 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                     variant="contained"
                     color="primary"
                   >
-                    Update Aircraft
+                    {originalAircraftData ? 'Save Changes' : 'Use Aircraft'}
                   </Button>
-                  <Alert severity="warning" sx={{ ml: 2, flex: 1 }}>
-                    Edits to logged aircraft will apply to all previous logs.
+                  <Alert severity="info" sx={{ ml: 2, flex: 1 }}>
+                    Aircraft changes will be saved when you submit the log.
                   </Alert>
                 </Box>
               </Grid>
@@ -738,7 +744,7 @@ const AircraftSelector = ({ formData, setFormData, setError }) => {
                     variant="contained"
                     color="primary"
                   >
-                    Add Aircraft
+                    Use Aircraft
                   </Button>
                 </Box>
               </Grid>
