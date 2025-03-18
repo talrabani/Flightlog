@@ -581,6 +581,55 @@ app.post('/api/user-aircraft', async (req, res) => {
   }
 });
 
+// Update a custom aircraft
+app.put('/api/user-aircraft/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      aircraft_reg,
+      aircraft_designator,
+      aircraft_manufacturer,
+      aircraft_model,
+      aircraft_wtc,
+      aircraft_category,
+      aircraft_class
+    } = req.body;
+
+    const query = `
+      UPDATE user_aircraft
+      SET 
+        aircraft_reg = $1,
+        aircraft_designator = $2,
+        aircraft_manufacturer = $3,
+        aircraft_model = $4,
+        aircraft_wtc = $5,
+        aircraft_category = $6,
+        aircraft_class = $7
+      WHERE id = $8
+      RETURNING *;
+    `;
+
+    const values = [
+      aircraft_reg,
+      aircraft_designator,
+      aircraft_manufacturer,
+      aircraft_model,
+      aircraft_wtc,
+      aircraft_category,
+      aircraft_class,
+      id
+    ];
+
+    const result = await pool.query(query, values);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating custom aircraft:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+
+
 // Get user's aircraft
 app.get('/api/user-aircraft/:userId', async (req, res) => {
   try {

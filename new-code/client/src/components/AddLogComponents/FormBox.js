@@ -4,7 +4,7 @@ import {
   Typography,
 } from '@mui/material';
 
-const FormBox = ({ title, icon, children }) => {
+const FormBox = ({ title, icon, children, action }) => {
   return (
     <Box sx={{ 
       border: 1, 
@@ -15,17 +15,29 @@ const FormBox = ({ title, icon, children }) => {
       px: 2,
       mb: 2,
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      backgroundColor: '#f8f9fa'
+      backgroundColor: '#f8f9fa',
+      position: 'relative'
     }}>
-      <Typography variant="subtitle1" sx={{ 
+      <Box sx={{ 
         display: 'flex', 
-        alignItems: 'center', 
-        gap: 1,
+        justifyContent: 'space-between', 
+        alignItems: 'center',
         mb: 0.5
       }}>
-        <h3 style={{ margin: 0 }}>{title}</h3>
-        {icon}  
-      </Typography>
+        <Typography variant="subtitle1" sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1
+        }}>
+          <h3 style={{ margin: 0 }}>{title}</h3>
+          {icon}  
+        </Typography>
+        {action && (
+          <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+            {action}
+          </Box>
+        )}
+      </Box>
       {children}
     </Box>
   );
